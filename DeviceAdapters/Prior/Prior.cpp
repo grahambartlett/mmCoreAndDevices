@@ -19,7 +19,7 @@
 // AUTHOR:        Nenad Amodaj, nenad@amodaj.com, 06/01/2006
 //                Graham Bartlett, gbartlett@prior.com, 20 Mar 2020
 //
-// CVS:           $Id$
+// CVS:           $Id: Prior.cpp 17410 2020-12-23 21:39:43Z nico $
 //
 
 #ifdef WIN32
@@ -28,11 +28,15 @@
 #include "FixSnprintf.h"
 
 #include "prior.h"
+#include "prior_PureFocus.h"
+
 #include <cstdio>
 #include <string>
 #include <math.h>
-#include "ModuleInterface.h"
 #include <sstream>
+
+#include "../../MMDevice/ModuleInterface.h"
+
 
 const char* g_XYStageDeviceName = "XYStage";
 const char* g_ZStageDeviceName = "ZStage";
@@ -49,8 +53,9 @@ const char* g_TTL0Name="TTL-0";
 const char* g_TTL1Name="TTL-1";
 const char* g_TTL2Name="TTL-2";
 const char* g_TTL3Name="TTL-3";
+const char* g_PureFocus850AutoFocusName = "PureFocus850";
+const char* g_PureFocus850ZStageName = "PureFocus850ZStage";
 
-//using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Exported MMDevice API
@@ -71,94 +76,98 @@ MODULE_API void InitializeModuleData()
    RegisterDevice(g_TTL1Name, MM::ShutterDevice, "Pro Scan TTL 1");
    RegisterDevice(g_TTL2Name, MM::ShutterDevice, "Pro Scan TTL 2");
    RegisterDevice(g_TTL3Name, MM::ShutterDevice, "Pro Scan TTL 3");
+   RegisterDevice(g_PureFocus850AutoFocusName, MM::AutoFocusDevice, "PureFocus 850 autofocus");
+   RegisterDevice(g_PureFocus850ZStageName, MM::StageDevice, "PureFocus 850 autofocus Z-stage");
 }
 
 MODULE_API MM::Device* CreateDevice(const char* deviceName)
 {
-   if (deviceName == 0)
-      return 0;
+	MM::Device* returnValue = NULL;
 
-   if (strcmp(deviceName, g_Shutter1Name) == 0)
-   {
-      Shutter* s = new Shutter(g_Shutter1Name, 1);
-      return s;
-   }
-   else if (strcmp(deviceName, g_Shutter2Name) == 0)
-   {
-      Shutter* s = new Shutter(g_Shutter2Name, 2);
-      return s;
-   }
-   else if (strcmp(deviceName, g_Shutter3Name) == 0)
-   {
-      Shutter* s = new Shutter(g_Shutter3Name, 3);
-      return s;
-   }
-   else if (strcmp(deviceName, g_Wheel1Name) == 0)
-   {
-      Wheel* s = new Wheel(g_Wheel1Name, 1);
-      return s;
-   }
-   else if (strcmp(deviceName, g_Wheel2Name) == 0)
-   {
-      Wheel* s = new Wheel(g_Wheel2Name, 2);
-      return s;
-   }
-   else if (strcmp(deviceName, g_Wheel3Name) == 0)
-   {
-      Wheel* s = new Wheel(g_Wheel3Name, 3);
-      return s;
-   }
-   else if (strcmp(deviceName, g_ZStageDeviceName) == 0)
-   {
-      ZStage* s = new ZStage();
-      return s;
-   }
-   else if (strcmp(deviceName, g_NanoStageDeviceName) == 0)
-   {
-      NanoZStage* s = new NanoZStage();
-      return s;
-   }
-   else if (strcmp(deviceName, g_XYStageDeviceName) == 0)
-   {
-      XYStage* s = new XYStage();
-      return s;
-   }
-   else if (strcmp(deviceName, g_LumenName) == 0)
-   {
-      Lumen* s = new Lumen();
-      return s;
-   }
-   else if (strcmp(deviceName, g_TTL0Name) == 0)
-   {
-      TTLShutter* s = new TTLShutter(g_TTL0Name, 0);
-      return s;
-   }
-   else if (strcmp(deviceName, g_TTL1Name) == 0)
-   {
-      TTLShutter* s = new TTLShutter(g_TTL1Name, 1);
-      return s;
-   }
-   else if (strcmp(deviceName, g_TTL2Name) == 0)
-   {
-      TTLShutter* s = new TTLShutter(g_TTL2Name, 2);
-      return s;
-   }
-   else if (strcmp(deviceName, g_TTL3Name) == 0)
-   {
-      TTLShutter* s = new TTLShutter(g_TTL3Name, 3);
-      return s;
-   }
+	if (deviceName == NULL)
+	{
+		// No device name
+	}
+	else if (strcmp(deviceName, g_Shutter1Name) == 0)
+	{
+		returnValue = new Shutter(g_Shutter1Name, 1);
+	}
+	else if (strcmp(deviceName, g_Shutter2Name) == 0)
+	{
+		returnValue = new Shutter(g_Shutter2Name, 2);
+	}
+	else if (strcmp(deviceName, g_Shutter3Name) == 0)
+	{
+		returnValue = new Shutter(g_Shutter3Name, 3);
+	}
+	else if (strcmp(deviceName, g_Wheel1Name) == 0)
+	{
+		returnValue = new Wheel(g_Wheel1Name, 1);
+	}
+	else if (strcmp(deviceName, g_Wheel2Name) == 0)
+	{
+		returnValue = new Wheel(g_Wheel2Name, 2);
+	}
+	else if (strcmp(deviceName, g_Wheel3Name) == 0)
+	{
+		returnValue = new Wheel(g_Wheel3Name, 3);
+	}
+	else if (strcmp(deviceName, g_ZStageDeviceName) == 0)
+	{
+		returnValue = new ZStage();
+	}
+	else if (strcmp(deviceName, g_NanoStageDeviceName) == 0)
+	{
+		returnValue = new NanoZStage();
+	}
+	else if (strcmp(deviceName, g_XYStageDeviceName) == 0)
+	{
+		returnValue = new XYStage();
+	}
+	else if (strcmp(deviceName, g_LumenName) == 0)
+	{
+		returnValue = new Lumen();
+	}
+	else if (strcmp(deviceName, g_TTL0Name) == 0)
+	{
+		returnValue = new TTLShutter(g_TTL0Name, 0);
+	}
+	else if (strcmp(deviceName, g_TTL1Name) == 0)
+	{
+		returnValue = new TTLShutter(g_TTL1Name, 1);
+	}
+	else if (strcmp(deviceName, g_TTL2Name) == 0)
+	{
+		returnValue = new TTLShutter(g_TTL2Name, 2);
+	}
+	else if (strcmp(deviceName, g_TTL3Name) == 0)
+	{
+		returnValue = new TTLShutter(g_TTL3Name, 3);
+	}
+	else if (strcmp(deviceName, g_PureFocus850AutoFocusName) == 0)
+	{
+		returnValue = new PureFocus850AutoFocus();
+	}
+	else if (strcmp(deviceName, g_PureFocus850ZStageName) == 0)
+	{
+		returnValue = new PureFocus850ZStage();
+	}
+	else
+	{
+		// Not found
+	}
 
-
-   return 0;
+	return returnValue;
 }
+
 
 MODULE_API void DeleteDevice(MM::Device* pDevice)
 {
    delete pDevice;
 }
 
-int ClearPort(MM::Device& device, MM::Core& core, std::string port)
+
+int Prior::ClearPort(MM::Device& device, MM::Core& core, std::string port)
 {
    // Clear contents of serial port 
    const int bufSize = 255;
@@ -169,7 +178,7 @@ int ClearPort(MM::Device& device, MM::Core& core, std::string port)
    {
       ret = core.ReadFromSerial(&device, port.c_str(), clear, bufSize, read);
       if (ret != DEVICE_OK)
-         return ret;
+		return ret;
    }
    return DEVICE_OK;
 }
@@ -313,7 +322,7 @@ int Shutter::Fire(double /*deltaT*/)
 int Shutter::SetShutterPosition(bool state)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -353,7 +362,7 @@ int Shutter::SetShutterPosition(bool state)
 int Shutter::GetShutterPosition(bool& state)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -634,7 +643,7 @@ int Wheel::Shutdown()
 int Wheel::SetWheelPosition(unsigned pos)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -948,7 +957,7 @@ bool XYStage::ControllerBusy()
    MMThreadGuard guard(lock_);
 
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return false; // this is an error, but here we have no choice but to return "not busy"
 
@@ -984,7 +993,7 @@ int XYStage::SetPositionSteps(long x, long y)
    MMThreadGuard guard(lock_);
 
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1020,7 +1029,7 @@ int XYStage::SetRelativePositionSteps(long x, long y)
    MMThreadGuard guard(lock_);
 
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1065,7 +1074,7 @@ int XYStage::Home()
    MMThreadGuard guard(lock_);
 
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1130,7 +1139,7 @@ int XYStage::SetOrigin()
    MMThreadGuard guard(lock_);
 
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1218,7 +1227,7 @@ int XYStage::OnStepSizeY(MM::PropertyBase* pProp, MM::ActionType eAct)
  */
 int XYStage::OnMaxSpeed(MM::PropertyBase* pProp, MM::ActionType eAct) 
 {
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1283,7 +1292,7 @@ int XYStage::OnMaxSpeed(MM::PropertyBase* pProp, MM::ActionType eAct)
  */
 int XYStage::OnAcceleration(MM::PropertyBase* pProp, MM::ActionType eAct) 
 {
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1348,7 +1357,7 @@ int XYStage::OnAcceleration(MM::PropertyBase* pProp, MM::ActionType eAct)
  */
 int XYStage::OnSCurve(MM::PropertyBase* pProp, MM::ActionType eAct) 
 {
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1432,7 +1441,7 @@ int XYStage::GetResolution(double& resX, double& resY)
 int XYStage::GetDblParameter(const char* command, double& param)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1464,7 +1473,7 @@ int XYStage::GetDblParameter(const char* command, double& param)
 int XYStage::GetPositionStepsSingle(char axis, long& steps)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1669,7 +1678,7 @@ int ZStage::Shutdown()
 bool ZStage::Busy()
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return false;
 
@@ -1720,7 +1729,7 @@ int ZStage::GetPositionUm(double& pos)
 int ZStage::SetPositionSteps(long pos)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1759,7 +1768,7 @@ int ZStage::SetPositionSteps(long pos)
 int ZStage::GetPositionSteps(long& steps)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1797,7 +1806,7 @@ int ZStage::GetPositionSteps(long& steps)
 int ZStage::GetResolution(double& res)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1868,7 +1877,7 @@ int ZStage::OnPort(MM::PropertyBase* pProp, MM::ActionType eAct)
  */
 int ZStage::OnMaxSpeed(MM::PropertyBase* pProp, MM::ActionType eAct) 
 {
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1933,7 +1942,7 @@ int ZStage::OnMaxSpeed(MM::PropertyBase* pProp, MM::ActionType eAct)
  */
 int ZStage::OnAcceleration(MM::PropertyBase* pProp, MM::ActionType eAct) 
 {
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -1998,7 +2007,7 @@ int ZStage::OnAcceleration(MM::PropertyBase* pProp, MM::ActionType eAct)
  */
 int ZStage::OnSCurve(MM::PropertyBase* pProp, MM::ActionType eAct) 
 {
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -2163,7 +2172,7 @@ bool NanoZStage::Busy()
 int NanoZStage::SetPositionUm(double pos)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -2197,7 +2206,7 @@ int NanoZStage::SetPositionUm(double pos)
 int NanoZStage::GetPositionUm(double& pos)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -2258,7 +2267,7 @@ int NanoZStage::GetPositionSteps(long& steps)
   
 int NanoZStage::SetRelativePositionUm(double pos)
 {
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -2325,7 +2334,7 @@ int NanoZStage::SetOrigin()
 int NanoZStage::GetLimits(double& min, double& max)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -2791,7 +2800,7 @@ int Lumen::Fire(double /*deltaT*/)
 int Lumen::SetShutterPosition(bool state)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -3029,7 +3038,7 @@ int TTLShutter::Fire(double /*deltaT*/)
 int TTLShutter::SetShutterPosition(bool state)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 
@@ -3070,7 +3079,7 @@ int TTLShutter::SetShutterPosition(bool state)
 int TTLShutter::GetShutterPosition(bool& state)
 {
    // First Clear serial port from previous stuff
-   int ret = ClearPort(*this, *GetCoreCallback(), port_);
+   int ret = Prior::ClearPort(*this, *GetCoreCallback(), port_);
    if (ret != DEVICE_OK)
       return ret;
 

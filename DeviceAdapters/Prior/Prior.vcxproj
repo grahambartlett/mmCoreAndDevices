@@ -161,9 +161,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Prior.cpp" />
+    <ClCompile Include="Prior_PureFocus.cpp" />
+    <ClCompile Include="Prior_PureFocus_comms.cpp" />
+    <ClCompile Include="Prior_PureFocus_ObjectiveSlot.cpp" />
+    <ClCompile Include="Prior_PureFocus_properties.cpp" />
+    <ClCompile Include="Prior_PureFocus_properties_objective.cpp" />
+    <ClCompile Include="Prior_PureFocus_properties_settings.cpp" />
+    <ClCompile Include="Prior_PureFocus_properties_status.cpp" />
+    <ClCompile Include="Prior_PureFocus_ZStage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="prior.h" />
+    <ClInclude Include="prior_PureFocus.h" />
+    <ClInclude Include="prior_shared.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\MMDevice\MMDevice-SharedRuntime.vcxproj">

@@ -18,34 +18,19 @@
 //
 // AUTHOR:        Nenad Amodaj, nenad@amodaj.com, 06/01/2006
 //
-// CVS:           $Id$
+// CVS:           $Id: prior.h 17231 2020-01-07 18:05:26Z nico $
 //
 
 #ifndef _PRIOR_H_
 #define _PRIOR_H_
 
-#include "MMDevice.h"
-#include "DeviceBase.h"
+#include "prior_shared.h"
+
+#include "../../MMDevice/MMDevice.h"
+#include "../../MMDevice/DeviceBase.h"
 #include <string>
 #include <map>
 
-//////////////////////////////////////////////////////////////////////////////
-// Error codes
-//
-#define ERR_UNKNOWN_POSITION         10002
-#define ERR_PORT_CHANGE_FORBIDDEN    10004
-#define ERR_SET_POSITION_FAILED      10005
-#define ERR_INVALID_STEP_SIZE        10006
-#define ERR_INVALID_MODE             10008
-#define ERR_UNRECOGNIZED_ANSWER      10009
-#define ERR_UNSPECIFIED_ERROR        10010
-
-#define ERR_OFFSET 10100
-
-#define ERR_INVALID_MESSAGE			(ERR_OFFSET + 4)
-#define ERR_INVALID_VALUE			(ERR_OFFSET + 8)
-
-int ClearPort(MM::Device& device, MM::Core& core);
 
 class Shutter : public CShutterBase<Shutter>
 {
@@ -364,4 +349,5 @@ private:
    TTLShutter& operator=(TTLShutter& /*rhs*/) {assert(false); return *this;}
 };
 
-#endif //_PRIOR_H_
+
+#endif
