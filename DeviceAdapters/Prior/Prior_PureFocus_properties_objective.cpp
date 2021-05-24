@@ -158,6 +158,128 @@ void PureFocus850AutoFocus::UpdateObjectiveSlotProperties(const long slot)
 }
 
 
+int PureFocus850AutoFocus::SendObjectiveSlotProperties(const long slot)
+{
+	int ret = DEVICE_OK;
+	int index = slot - 1;
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetPinhole(objective[index].pinholeCentre, objective[index].pinholeWidth);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetLaserPower(objective[index].laserPower);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetBackgrounds(objective[index].backgroundA,
+			objective[index].backgroundB,
+			objective[index].backgroundC,
+			objective[index].backgroundD);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetKP(objective[index].kP);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetKI(objective[index].kI);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetKD(objective[index].kD);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetServoDirectionPositive(objective[index].servoDirectionSignIsPositive);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetOutputLimits(objective[index].outputLimitMin, objective[index].outputLimitMax);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetSampleLowThreshold(objective[index].sampleLowThreshold);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetFocusLowThreshold(objective[index].focusLowThreshold);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetFocusHighThreshold(objective[index].focusHighThreshold);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetFocusRangeThreshold(objective[index].focusRangeThreshold);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetInFocusRecoveryTime(objective[index].inFocusRecoveryTimeMs);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetInterfaceHighThreshold(objective[index].interfaceHighThreshold);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetInterfaceLowThreshold(objective[index].interfaceLowThreshold);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetFocusServoInterruptOn(objective[index].focusServoInterruptOn);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetServoLimit(objective[index].servoLimitOn, objective[index].servoLimitMaxPositive, objective[index].servoLimitMaxNegative);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetPiezoMode(objective[index].isPiezoMotor);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetFocusDriveRange(objective[index].focusDriveRangeMicrons);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetMaxFocusSpeedMicronsPerS(objective[index].maxFocusSpeedMicronsPerS);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetMaxFocusAccelMicronsPerS2(objective[index].maxFocusAccelMicronsPerS2);
+	}
+
+	if (ret == DEVICE_OK)
+	{
+		ret = SetFocusDriveDirectionPositive(objective[index].focusDriveDirectionSignIsPositive);
+	}
+
+	return ret;
+}
+
+
 int PureFocus850AutoFocus::OnPreset(MM::PropertyBase* pProp, MM::ActionType eAct, long slot)
 {
 	int ret = DEVICE_OK;
@@ -220,6 +342,8 @@ int PureFocus850AutoFocus::OnPreset(MM::PropertyBase* pProp, MM::ActionType eAct
 						pProp->Get(value);
 						objective[slot - 1].setPreset(value);
 						UpdateObjectiveSlotProperties(slot);
+
+						ret = SendObjectiveSlotProperties(slot);
 					}
 				}
 
@@ -3767,7 +3891,7 @@ int PureFocus850AutoFocus::OnConfigInProgress(MM::PropertyBase* pProp, MM::Actio
 		{
 			bool isServoing = false;
 			long objectiveSelected = 1;
-			long slot, index;
+			long slot;
 
 			// After this, properties can only be changed for current objective
 			configInProgress = false;
@@ -3787,125 +3911,14 @@ int PureFocus850AutoFocus::OnConfigInProgress(MM::PropertyBase* pProp, MM::Actio
 			}
 
 			// Configure all objective slots
-			for (index = 0, slot = 1; (index < 6) && (ret == DEVICE_OK); index++, slot++)
+			for (slot = 1; (slot <= 6) && (ret == DEVICE_OK); slot++)
 			{
 				if (ret == DEVICE_OK)
 				{
 					ret = SetObjective(slot);
 				}
 
-				if (ret == DEVICE_OK)
-				{
-					ret = SetPinhole(objective[index].pinholeCentre, objective[index].pinholeWidth);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetLaserPower(objective[index].laserPower);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetBackgrounds(objective[index].backgroundA,
-						objective[index].backgroundB,
-						objective[index].backgroundC,
-						objective[index].backgroundD);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetKP(objective[index].kP);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetKI(objective[index].kI);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetKD(objective[index].kD);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetServoDirectionPositive(objective[index].servoDirectionSignIsPositive);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetOutputLimits(objective[index].outputLimitMin, objective[index].outputLimitMax);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetSampleLowThreshold(objective[index].sampleLowThreshold);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetFocusLowThreshold(objective[index].focusLowThreshold);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetFocusHighThreshold(objective[index].focusHighThreshold);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetFocusRangeThreshold(objective[index].focusRangeThreshold);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetInFocusRecoveryTime(objective[index].inFocusRecoveryTimeMs);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetInterfaceHighThreshold(objective[index].interfaceHighThreshold);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetInterfaceLowThreshold(objective[index].interfaceLowThreshold);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetFocusServoInterruptOn(objective[index].focusServoInterruptOn);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetServoLimit(objective[index].servoLimitOn, objective[index].servoLimitMaxPositive, objective[index].servoLimitMaxNegative);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetPiezoMode(objective[index].isPiezoMotor);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetFocusDriveRange(objective[index].focusDriveRangeMicrons);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetMaxFocusSpeedMicronsPerS(objective[index].maxFocusSpeedMicronsPerS);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetMaxFocusAccelMicronsPerS2(objective[index].maxFocusAccelMicronsPerS2);
-				}
-
-				if (ret == DEVICE_OK)
-				{
-					ret = SetFocusDriveDirectionPositive(objective[index].focusDriveDirectionSignIsPositive);
-				}
+				ret = SendObjectiveSlotProperties(slot);
 			}
 
 			// Return to initial operating state

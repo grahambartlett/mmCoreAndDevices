@@ -305,6 +305,12 @@ private:
 	@param slot Objective slot (1-6)
 	*/
 	void UpdateObjectiveSlotProperties(const long slot);
+
+	/** Send properties to PF850 for an objective slot
+	@param slot Objective slot (1-6)
+	@returns DEVICE_OK if succeeded
+	*/
+	int SendObjectiveSlotProperties(const long slot);
 };
 
 
