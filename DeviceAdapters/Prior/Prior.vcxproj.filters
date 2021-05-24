@@ -30,9 +30,6 @@
     <ClCompile Include="Prior_PureFocus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Prior_PureFocus_comms.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Prior_PureFocus_properties.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -40,6 +37,30 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Prior_PureFocus_ObjectiveSlot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Prior_PureFocus_comms_FocusSignal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Prior_PureFocus_comms_ObjectiveParameters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Prior_PureFocus_comms_ServoSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Prior_PureFocus_comms_SignalSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Prior_PureFocus_comms_SystemCommands.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Prior_PureFocus_comms_DigipotSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Prior_PureFocus_comms_FlagSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Prior_PureFocus_comms_FocusCommands.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

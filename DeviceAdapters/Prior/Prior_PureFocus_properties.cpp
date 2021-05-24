@@ -56,14 +56,14 @@ int PureFocus850AutoFocus::OnSerialNumber(MM::PropertyBase* pProp, MM::ActionTyp
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
 	{
-		long value = 0;
-		if (initialized)
-		{
-			ret = GetSerialNumber(value);
-		}
-
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		long value;
+		ret = GetSerialNumber(value);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set(value);
@@ -78,14 +78,14 @@ int PureFocus850AutoFocus::OnBuildVersion(MM::PropertyBase* pProp, MM::ActionTyp
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		std::string version, dateTime;
-		if (initialized)
-		{
-			ret = GetBuildInfo(version, dateTime);
-		}
-
+		ret = GetBuildInfo(version, dateTime);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set(version.c_str());
@@ -100,14 +100,14 @@ int PureFocus850AutoFocus::OnBuildDateTime(MM::PropertyBase* pProp, MM::ActionTy
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		std::string version, dateTime;
-		if (initialized)
-		{
-			ret = GetBuildInfo(version, dateTime);
-		}
-
+		ret = GetBuildInfo(version, dateTime);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set(dateTime.c_str());

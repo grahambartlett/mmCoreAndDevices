@@ -162,7 +162,14 @@
   <ItemGroup>
     <ClCompile Include="Prior.cpp" />
     <ClCompile Include="Prior_PureFocus.cpp" />
-    <ClCompile Include="Prior_PureFocus_comms.cpp" />
+    <ClCompile Include="Prior_PureFocus_comms_DigipotSettings.cpp" />
+    <ClCompile Include="Prior_PureFocus_comms_FlagSettings.cpp" />
+    <ClCompile Include="Prior_PureFocus_comms_FocusCommands.cpp" />
+    <ClCompile Include="Prior_PureFocus_comms_FocusSignal.cpp" />
+    <ClCompile Include="Prior_PureFocus_comms_ObjectiveParameters.cpp" />
+    <ClCompile Include="Prior_PureFocus_comms_ServoSettings.cpp" />
+    <ClCompile Include="Prior_PureFocus_comms_SignalSettings.cpp" />
+    <ClCompile Include="Prior_PureFocus_comms_SystemCommands.cpp" />
     <ClCompile Include="Prior_PureFocus_ObjectiveSlot.cpp" />
     <ClCompile Include="Prior_PureFocus_properties.cpp" />
     <ClCompile Include="Prior_PureFocus_properties_objective.cpp" />

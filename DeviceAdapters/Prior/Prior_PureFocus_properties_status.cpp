@@ -30,14 +30,14 @@ int PureFocus850AutoFocus::OnCalculationABCD(MM::PropertyBase* pProp, MM::Action
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		double a = 0.0, b = 0.0, c = 0.0, d = 0.0;
-		if (initialized)
-		{
-			ret = GetABCD(a, b, c, d);
-		}
-
+		ret = GetABCD(a, b, c, d);
 		if (ret == DEVICE_OK)
 		{
 			std::ostringstream stringValue;
@@ -54,14 +54,14 @@ int PureFocus850AutoFocus::OnFocusPidPosition(MM::PropertyBase* pProp, MM::Actio
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		double value = 0.0;
-		if (initialized)
-		{
-			ret = GetFocusPidPosition(value);
-		}
-
+		ret = GetFocusPidPosition(value);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set(value);
@@ -76,14 +76,14 @@ int PureFocus850AutoFocus::OnFocusPidError(MM::PropertyBase* pProp, MM::ActionTy
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		double value = 0.0;
-		if (initialized)
-		{
-			ret = GetFocusPidError(value);
-		}
-
+		ret = GetFocusPidError(value);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set(value);
@@ -98,14 +98,14 @@ int PureFocus850AutoFocus::OnFocusPidOutput(MM::PropertyBase* pProp, MM::ActionT
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		double value = 0.0;
-		if (initialized)
-		{
-			ret = GetFocusPidOutput(value);
-		}
-
+		ret = GetFocusPidOutput(value);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set(value);
@@ -120,14 +120,14 @@ int PureFocus850AutoFocus::OnFocusPidTarget(MM::PropertyBase* pProp, MM::ActionT
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		double value = 0.0;
-		if (initialized)
-		{
-			ret = GetFocusPidTarget(value);
-		}
-
+		ret = GetFocusPidTarget(value);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set(value);
@@ -142,14 +142,14 @@ int PureFocus850AutoFocus::OnFocusState(MM::PropertyBase* pProp, MM::ActionType 
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		bool value = false;
-		if (initialized)
-		{
-			ret = GetFocusState(value);
-		}
-
+		ret = GetFocusState(value);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set((long)value);
@@ -164,14 +164,14 @@ int PureFocus850AutoFocus::OnTimeToInFocus(MM::PropertyBase* pProp, MM::ActionTy
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		double value = 0.0;
-		if (initialized)
-		{
-			ret = GetTimeToInFocus(value);
-		}
-
+		ret = GetTimeToInFocus(value);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set(value);
@@ -186,14 +186,14 @@ int PureFocus850AutoFocus::OnInterfaceCorrect(MM::PropertyBase* pProp, MM::Actio
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		bool value = false;
-		if (initialized)
-		{
-			ret = GetInterfaceCorrect(value);
-		}
-
+		ret = GetInterfaceCorrect(value);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set((long)value);
@@ -208,14 +208,14 @@ int PureFocus850AutoFocus::OnIsOffsetMoving(MM::PropertyBase* pProp, MM::ActionT
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		bool value = false;
-		if (initialized)
-		{
-			ret = GetIsOffsetMoving(value);
-		}
-
+		ret = GetIsOffsetMoving(value);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set((long)value);
@@ -230,14 +230,14 @@ int PureFocus850AutoFocus::OnIsFocusDriveMoving(MM::PropertyBase* pProp, MM::Act
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		bool value = false;
-		if (initialized)
-		{
-			ret = GetIsFocusDriveMoving(value);
-		}
-
+		ret = GetIsFocusDriveMoving(value);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set((long)value);
@@ -252,14 +252,14 @@ int PureFocus850AutoFocus::OnPositiveLimitSwitch(MM::PropertyBase* pProp, MM::Ac
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		bool positive = false, negative = false;
-		if (initialized)
-		{
-			ret = GetLimitSwitches(positive, negative);
-		}
-
+		ret = GetLimitSwitches(positive, negative);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set((long)positive);
@@ -274,14 +274,14 @@ int PureFocus850AutoFocus::OnNegativeLimitSwitch(MM::PropertyBase* pProp, MM::Ac
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
 	{
 		bool positive = false, negative = false;
-		if (initialized)
-		{
-			ret = GetLimitSwitches(positive, negative);
-		}
-
+		ret = GetLimitSwitches(positive, negative);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set((long)negative);

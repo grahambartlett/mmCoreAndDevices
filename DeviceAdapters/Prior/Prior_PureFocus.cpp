@@ -40,7 +40,9 @@ objectiveSelect(1),
 servoInhibit(false),
 digipotControlsOffset(false),
 offsetPositionUm(0.0),
-focusPositionUm(0.0)
+focusPositionUm(0.0),
+configInProgress(true),
+singleChangeInProgress(false)
 {
 	CPropertyAction* action;
 	CPropertyActionEx* actionEx;
@@ -53,7 +55,7 @@ focusPositionUm(0.0)
 
 	// Pre-initialization properties
 	CreateProperty(MM::g_Keyword_Name, name.c_str(), MM::String, true);
-	CreateProperty(MM::g_Keyword_Description, "Prior PureFocus 850 autofocus", MM::String, true);
+	CreateProperty(MM::g_Keyword_Description, "Prior PureFocus PF-850 autofocus", MM::String, true);
 
 	// Port
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnPort);
@@ -79,202 +81,374 @@ focusPositionUm(0.0)
 		
 		propertyName = baseName;
 		propertyName.append("Preset");
-		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnPresetInit, i);
-		CreateProperty(propertyName.c_str(), "", MM::String, false, actionEx, true);
-
-		propertyName = baseName;
-		propertyName.append("PresetSettable");
 		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnPreset, i);
-		CreateProperty(propertyName.c_str(), "", MM::String, false, actionEx, false);
+		CreateProperty(propertyName.c_str(), "", MM::String, false, actionEx);
 
 		propertyName = baseName;
 		propertyName.append("PinholeCentre");
 		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnPinholeCentre, i);
-		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
 		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
 
 		propertyName = baseName;
 		propertyName.append("PinholeWidth");
 		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnPinholeWidth, i);
-		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
 		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
 
-		//propertyName = baseName;
-		//propertyName.append("LaserPower");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnLaserPower, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
+		propertyName = baseName;
+		propertyName.append("LaserPower");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnLaserPower, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
 
-		//propertyName = baseName;
-		//propertyName.append("BackgroundA");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnBackgroundA, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
+		propertyName = baseName;
+		propertyName.append("BackgroundA");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnBackgroundA, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
 
-		//propertyName = baseName;
-		//propertyName.append("BackgroundB");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnBackgroundB, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
+		propertyName = baseName;
+		propertyName.append("BackgroundB");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnBackgroundB, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
 
-		//propertyName = baseName;
-		//propertyName.append("BackgroundC");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnBackgroundC, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
+		propertyName = baseName;
+		propertyName.append("BackgroundC");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnBackgroundC, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
 
-		//propertyName = baseName;
-		//propertyName.append("BackgroundD");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnBackgroundD, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
+		propertyName = baseName;
+		propertyName.append("BackgroundD");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnBackgroundD, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
 
-		//propertyName = baseName;
-		//propertyName.append("KP");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnKP, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1.0e10);
+		propertyName = baseName;
+		propertyName.append("KP");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnKP, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1.0e10);
 
-		//propertyName = baseName;
-		//propertyName.append("KI");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnKI, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1.0e10);
+		propertyName = baseName;
+		propertyName.append("KI");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnKI, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1.0e10);
 
-		//propertyName = baseName;
-		//propertyName.append("KD");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnKD, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1.0e10);
+		propertyName = baseName;
+		propertyName.append("KD");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnKD, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1.0e10);
 
-		//propertyName = baseName;
-		//propertyName.append("IsServoDirectionPositive");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnServoDirectionSignIsPositive, i);
-		//CreateProperty(propertyName.c_str(), "1", MM::Integer, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0, 1);
+		propertyName = baseName;
+		propertyName.append("IsServoDirectionPositive");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnServoDirectionSignIsPositive, i);
+		CreateProperty(propertyName.c_str(), "1", MM::Integer, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0, 1);
 
-		//propertyName = baseName;
-		//propertyName.append("OutputLimitMinimum");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnOutputLimitMin, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), -1e10, 0.0);
+		propertyName = baseName;
+		propertyName.append("OutputLimitMinimum");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnOutputLimitMin, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), -1e10, 0.0);
 
-		//propertyName = baseName;
-		//propertyName.append("OutputLimitMaximum");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnOutputLimitMax, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+		propertyName = baseName;
+		propertyName.append("OutputLimitMaximum");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnOutputLimitMax, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
 
-		//propertyName = baseName;
-		//propertyName.append("SampleLowThreshold");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnSampleLowThreshold, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+		propertyName = baseName;
+		propertyName.append("SampleLowThreshold");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnSampleLowThreshold, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
 
-		//propertyName = baseName;
-		//propertyName.append("FocusLowThreshold");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusLowThreshold, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+		propertyName = baseName;
+		propertyName.append("FocusLowThreshold");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusLowThreshold, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
 
-		//propertyName = baseName;
-		//propertyName.append("FocusHighThreshold");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusHighThreshold, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+		propertyName = baseName;
+		propertyName.append("FocusHighThreshold");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusHighThreshold, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
 
-		//propertyName = baseName;
-		//propertyName.append("FocusRangeThreshold");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusRangeThreshold, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+		propertyName = baseName;
+		propertyName.append("FocusRangeThreshold");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusRangeThreshold, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
 
-		//propertyName = baseName;
-		//propertyName.append("InFocusRecoveryTimeMs");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnInFocusRecoveryTimeMs, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1e6);
+		propertyName = baseName;
+		propertyName.append("InFocusRecoveryTimeMs");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnInFocusRecoveryTimeMs, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e6);
 
-		//propertyName = baseName;
-		//propertyName.append("InterfaceHighThreshold");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnInterfaceHighThreshold, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+		propertyName = baseName;
+		propertyName.append("InterfaceHighThreshold");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnInterfaceHighThreshold, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
 
-		//propertyName = baseName;
-		//propertyName.append("InterfaceLowThreshold");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnInterfaceLowThreshold, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+		propertyName = baseName;
+		propertyName.append("InterfaceLowThreshold");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnInterfaceLowThreshold, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
 
-		//propertyName = baseName;
-		//propertyName.append("IsFocusServoInterruptOn");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusServoInterruptOn, i);
-		//CreateProperty(propertyName.c_str(), "0", MM::Integer, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0, 1);
+		propertyName = baseName;
+		propertyName.append("IsFocusServoInterruptOn");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusServoInterruptOn, i);
+		CreateProperty(propertyName.c_str(), "0", MM::Integer, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0, 1);
 
-		//propertyName = baseName;
-		//propertyName.append("IsServoLimitOn");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnServoLimitOn, i);
-		//CreateProperty(propertyName.c_str(), "0", MM::Integer, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0, 1);
+		propertyName = baseName;
+		propertyName.append("IsServoLimitOn");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnServoLimitOn, i);
+		CreateProperty(propertyName.c_str(), "0", MM::Integer, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0, 1);
 
-		//propertyName = baseName;
-		//propertyName.append("ServoLimitMaximumPositive");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnServoLimitMaxPositive, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+		propertyName = baseName;
+		propertyName.append("ServoLimitMaximumPositive");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnServoLimitMaxPositive, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
 
-		//propertyName = baseName;
-		//propertyName.append("ServoLimitMaximumNegative");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnServoLimitMaxNegative, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), -1e10, 0.0);
+		propertyName = baseName;
+		propertyName.append("ServoLimitMaximumNegative");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnServoLimitMaxNegative, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), -1e10, 0.0);
 
-		//propertyName = baseName;
-		//propertyName.append("IsPiezoMotor");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnIsPiezoMotor, i);
-		//CreateProperty(propertyName.c_str(), "0", MM::Integer, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0, 1);
+		propertyName = baseName;
+		propertyName.append("IsPiezoMotor");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnIsPiezoMotor, i);
+		CreateProperty(propertyName.c_str(), "0", MM::Integer, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0, 1);
 
-		//propertyName = baseName;
-		//propertyName.append("FocusDriveRangeMicrons");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusDriveRangeMicrons, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+		propertyName = baseName;
+		propertyName.append("FocusDriveRangeMicrons");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusDriveRangeMicrons, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
 
-		//propertyName = baseName;
-		//propertyName.append("MaxFocusSpeedPercent");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnMaxFocusSpeedPercent, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 100.0);
+		propertyName = baseName;
+		propertyName.append("MaxFocusSpeedMicronsPerS");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnMaxFocusSpeedMicronsPerS, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
 
-		//propertyName = baseName;
-		//propertyName.append("MaxFocusSpeedMicronsPerS");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnMaxFocusSpeedMicronsPerS, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+		propertyName = baseName;
+		propertyName.append("MaxFocusAccelMicronsPerS2");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnMaxFocusAccelMicronsPerS2, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
 
-		//propertyName = baseName;
-		//propertyName.append("MaxFocusAccelPercent");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnMaxFocusAccelPercent, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 100.0);
-
-		//propertyName = baseName;
-		//propertyName.append("MaxFocusAccelMicronsPerS2");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnMaxFocusAccelMicronsPerS2, i);
-		//CreateProperty(propertyName.c_str(), "0.0", MM::Float, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
-
-		//propertyName = baseName;
-		//propertyName.append("IsFocusDriveDirectionPositive");
-		//actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusDriveDirectionSignIsPositive, i);
-		//CreateProperty(propertyName.c_str(), "1", MM::Integer, false, actionEx, true);
-		//SetPropertyLimits(propertyName.c_str(), 0, 1);
+		propertyName = baseName;
+		propertyName.append("IsFocusDriveDirectionPositive");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusDriveDirectionSignIsPositive, i);
+		CreateProperty(propertyName.c_str(), "1", MM::Integer, false, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0, 1);
 	}
 
-	// Volatile settings read back from unit, not stored in configuration
+	// Current objective settings, read back
+	{
+		int i = 0;
+		std::string propertyName;
+		std::string baseName("Current-");
+		
+		propertyName = baseName;
+		propertyName.append("PinholeCentre");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnPinholeCentre, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
+
+		propertyName = baseName;
+		propertyName.append("PinholeWidth");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnPinholeWidth, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
+
+		propertyName = baseName;
+		propertyName.append("LaserPower");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnLaserPower, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
+
+		propertyName = baseName;
+		propertyName.append("BackgroundA");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnBackgroundA, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
+
+		propertyName = baseName;
+		propertyName.append("BackgroundB");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnBackgroundB, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
+
+		propertyName = baseName;
+		propertyName.append("BackgroundC");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnBackgroundC, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
+
+		propertyName = baseName;
+		propertyName.append("BackgroundD");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnBackgroundD, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 4095.0);
+
+		propertyName = baseName;
+		propertyName.append("KP");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnKP, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1.0e10);
+
+		propertyName = baseName;
+		propertyName.append("KI");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnKI, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1.0e10);
+
+		propertyName = baseName;
+		propertyName.append("KD");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnKD, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1.0e10);
+
+		propertyName = baseName;
+		propertyName.append("IsServoDirectionPositive");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnServoDirectionSignIsPositive, i);
+		CreateProperty(propertyName.c_str(), "1", MM::Integer, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0, 1);
+
+		propertyName = baseName;
+		propertyName.append("OutputLimitMinimum");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnOutputLimitMin, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), -1e10, 0.0);
+
+		propertyName = baseName;
+		propertyName.append("OutputLimitMaximum");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnOutputLimitMax, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+
+		propertyName = baseName;
+		propertyName.append("SampleLowThreshold");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnSampleLowThreshold, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+
+		propertyName = baseName;
+		propertyName.append("FocusLowThreshold");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusLowThreshold, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+
+		propertyName = baseName;
+		propertyName.append("FocusHighThreshold");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusHighThreshold, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+
+		propertyName = baseName;
+		propertyName.append("FocusRangeThreshold");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusRangeThreshold, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+
+		propertyName = baseName;
+		propertyName.append("InFocusRecoveryTimeMs");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnInFocusRecoveryTimeMs, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e6);
+
+		propertyName = baseName;
+		propertyName.append("InterfaceHighThreshold");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnInterfaceHighThreshold, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+
+		propertyName = baseName;
+		propertyName.append("InterfaceLowThreshold");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnInterfaceLowThreshold, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+
+		propertyName = baseName;
+		propertyName.append("IsFocusServoInterruptOn");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusServoInterruptOn, i);
+		CreateProperty(propertyName.c_str(), "0", MM::Integer, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0, 1);
+
+		propertyName = baseName;
+		propertyName.append("IsServoLimitOn");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnServoLimitOn, i);
+		CreateProperty(propertyName.c_str(), "0", MM::Integer, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0, 1);
+
+		propertyName = baseName;
+		propertyName.append("ServoLimitMaximumPositive");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnServoLimitMaxPositive, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+
+		propertyName = baseName;
+		propertyName.append("ServoLimitMaximumNegative");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnServoLimitMaxNegative, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), -1e10, 0.0);
+
+		propertyName = baseName;
+		propertyName.append("IsPiezoMotor");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnIsPiezoMotor, i);
+		CreateProperty(propertyName.c_str(), "0", MM::Integer, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0, 1);
+
+		propertyName = baseName;
+		propertyName.append("FocusDriveRangeMicrons");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusDriveRangeMicrons, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+
+		propertyName = baseName;
+		propertyName.append("MaxFocusSpeedMicronsPerS");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnMaxFocusSpeedMicronsPerS, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+
+		propertyName = baseName;
+		propertyName.append("MaxFocusAccelMicronsPerS2");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnMaxFocusAccelMicronsPerS2, i);
+		CreateProperty(propertyName.c_str(), "0.0", MM::Float, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0.0, 1e10);
+
+		propertyName = baseName;
+		propertyName.append("IsFocusDriveDirectionPositive");
+		actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnFocusDriveDirectionSignIsPositive, i);
+		CreateProperty(propertyName.c_str(), "1", MM::Integer, true, actionEx);
+		SetPropertyLimits(propertyName.c_str(), 0, 1);
+	}
+
+	// Volatile settings read back from unit, not stored in configuration.
+	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnConfigInProgress);
+	CreateProperty("ConfigInProgress", "1", MM::Integer, false, action, false);
+	SetPropertyLimits("ConfigInProgress", 0, 1);
+
+	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnSingleChangeInProgress);
+	CreateProperty("SingleChangeInProgress", "0", MM::Integer, false, action, false);
+	SetPropertyLimits("SingleChangeInProgress", 0, 1);
+
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnObjectiveSelect);
 	CreateProperty("Objective", "1", MM::Integer, false, action, false);
 	SetPropertyLimits("Objective", 1, 6);
@@ -332,7 +506,9 @@ focusPositionUm(0.0)
 PureFocus850AutoFocus::PureFocus850AutoFocus(PureFocus850AutoFocus&) :
 CAutoFocusBase <PureFocus850AutoFocus>(),
 name(g_PureFocus850AutoFocusName),
-initialized(false)
+initialized(false),
+configInProgress(false),
+singleChangeInProgress(false)
 {
 	// Should never be called
 	assert(false);
@@ -362,6 +538,8 @@ void PureFocus850AutoFocus::GetName(char* pszName) const
 int PureFocus850AutoFocus::Initialize()
 {
 	int ret = DEVICE_OK;
+	
+	/** @todo Add any initialisation here */
 
 	if (ret == DEVICE_OK)
 	{
@@ -410,6 +588,8 @@ int PureFocus850AutoFocus::Initialize()
 		ret = UpdateProperty("FocusPositionUm");
 	}
 
+	this->GetCoreCallback()->LogMessage(this, "Completed PureFocus Initialize()", false);
+
 	return ret;
 }
 
@@ -419,6 +599,8 @@ int PureFocus850AutoFocus::Shutdown()
 	if (initialized)
 	{
 		initialized = false;
+
+		SetProperty(MM::g_Keyword_Port, "Undefined");
 	}
 
 	return DEVICE_OK;

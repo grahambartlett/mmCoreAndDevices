@@ -32,6 +32,9 @@
 #include <map>
 
 
+/** Structure holding data for one objective slot.
+@todo Ultimately values should have "set" functions which provide validations.
+*/
 struct PureFocus850ObjectiveSlot
 {
 public:
@@ -62,13 +65,29 @@ public:
 	double servoLimitMaxNegative;
 	bool isPiezoMotor;
 	double focusDriveRangeMicrons;
-	double maxFocusSpeedPercent;
 	double maxFocusSpeedMicronsPerS;
-	double maxFocusAccelPercent;
 	double maxFocusAccelMicronsPerS2;
 	bool focusDriveDirectionSignIsPositive;
 
 	PureFocus850ObjectiveSlot();
+
+	/** Set settings to values for preset, if preset name is valid and not "Custom".
+	@param presetName Preset name
+	@returns True if preset name is valid, false if not.
+	*/
+	bool setPreset(const std::string& presetName);
+
+	/** Get valid preset name by index.  Start from index 0 and work up until function returns false.
+	@param presetName Valid preset name at index
+	@param index Index for name
+	@returns True if we have a name with this index, false if not
+	*/
+	bool getValidPresetName(std::string& presetName, unsigned long index);
+
+	/** Get default preset name
+	@param presetName Preset name
+	*/
+	void getDefaultPresetName(std::string& presetName);
 };
 
 
@@ -94,11 +113,10 @@ public:
 	virtual int GetOffset(double& offset);
 	virtual int SetOffset(double offset);
 
-	// Actions for properties stored in configuration
+	// Actions for setting comms port
 	int OnPort(MM::PropertyBase* pProp, MM::ActionType eAct);
 
 	// Actions for properties stored in configuration per objective slot
-	int OnPresetInit(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnPreset(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnPinholeCentre(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnPinholeWidth(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
@@ -126,11 +144,13 @@ public:
 	int OnServoLimitMaxNegative(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnIsPiezoMotor(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnFocusDriveRangeMicrons(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnMaxFocusSpeedPercent(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnMaxFocusSpeedMicronsPerS(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnMaxFocusAccelPercent(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnMaxFocusAccelMicronsPerS2(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnFocusDriveDirectionSignIsPositive(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
+
+	// Actions for properties used to sequence setting configuration values
+	int OnConfigInProgress(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnSingleChangeInProgress(MM::PropertyBase* pProp, MM::ActionType eAct);
 
 	// Actions for read/write settings properties not stored in configuration
 	int OnObjectiveSelect(MM::PropertyBase* pProp, MM::ActionType eAct);
@@ -163,39 +183,59 @@ public:
 	int SetObjective(const long value);
 	int GetObjective(long& value);
 	int SetPinhole(const double centre, const double width);
+	int GetPinhole(double& centre, double& width);
 	int SetLaserPower(const double value);
+	int GetLaserPower(double& value);
 	int SetBackgrounds(const double a, const double b, const double c, const double d);
+	int GetBackgrounds(double& a, double& b, double& c, double& d);
 	int GetABCD(double &a, double &b, double &c, double &d);
 	int GetFocusPidPosition(double& value);
 	int GetFocusPidError(double& value);
 	int GetFocusPidOutput(double& value);
 	int SetServoOn(const bool value);
+	int GetServoOn(bool& value);
 	int SetKP(const double value);
+	int GetKP(double& value);
 	int SetKI(const double value);
+	int GetKI(double& value);
 	int SetKD(const double value);
+	int GetKD(double& value);
 	int SetFocusPidTarget();
 	int GetFocusPidTarget(double& value);
 	int SetServoDirectionPositive(const bool value);
+	int GetServoDirectionPositive(bool& value);
 	int SetOutputLimits(const double min, const double max);
+	int GetOutputLimits(double& min, double& max);
 	int GetSampleState(bool& value);
 	int SetSampleLowThreshold(const double value);
+	int GetSampleLowThreshold(double& value);
 	int GetFocusState(bool& value);
 	int SetFocusLowThreshold(const double value);
+	int GetFocusLowThreshold(double& value);
 	int SetFocusHighThreshold(const double value);
+	int GetFocusHighThreshold(double& value);
 	int SetFocusRangeThreshold(const double value);
+	int GetFocusRangeThreshold(double& value);
 	int SetInFocusRecoveryTime(const double value);
-	int SetInterfaceHighThreshold(const double value);
-	int SetInterfaceLowThreshold(const double value);
+	int GetInFocusRecoveryTime(double& value);
 	int GetTimeToInFocus(double& value);
+	int SetInterfaceHighThreshold(const double value);
+	int GetInterfaceHighThreshold(double& value);
+	int SetInterfaceLowThreshold(const double value);
+	int GetInterfaceLowThreshold(double& value);
 	int GetInterfaceCorrect(bool& value);
 	int SetServoInhibit(const bool value);
 	int GetServoInhibit(bool& value);
 	int SetFocusServoInterruptOn(const bool value);
+	int GetFocusServoInterruptOn(bool& value);
 	int SetServoLimit(const bool isActive, const double maxPositive, const double maxNegative);
+	int GetServoLimit(bool& isActive, double& maxPositive, double& maxNegative);
 	int SetDigipotControlsOffset(const bool value);
 	int GetDigipotControlsOffset(bool& value);
 	int SetDigipotFocusSpeedPercent(const double value);
+	int GetDigipotFocusSpeedPercent(double& value);
 	int SetDigipotOffsetSpeedPercent(const double value);
+	int GetDigipotOffsetSpeedPercent(double& value);
 	int SetOffsetToHome();
 	int SetOffsetVelocityMoveUmPerS(const double value);
 	int GetOffsetPositionUm(double& value);
@@ -204,7 +244,9 @@ public:
 	int SetOffsetToStoredOffset(const long index);
 	int SetStoredOffsetToCurrentPosition(const long index);
 	int SetStoredOffsetUm(const long index, const double value);
+	int GetStoredOffsetUm(const long index, double& value);
 	int SetFocusDriveRange(const double value);
+	int GetFocusDriveRange(double& value);
 	int GetIsFocusDriveMoving(bool& value);
 	int SetFocusPositionUm(const double value);
 	int GetFocusPositionUm(double& value);
@@ -219,12 +261,14 @@ public:
 	int SetMaxFocusAccelMicronsPerS2(const double value);
 	int GetMaxFocusAccelMicronsPerS2(double& value);
 	int SetFocusDriveDirectionPositive(const bool value);
+	int GetFocusDriveDirectionPositive(bool& value);
 	int GetLimitSwitches(bool& positiveLimitActive, bool& negativeLimitActive);
 	int GetBuildInfo(std::string& version, std::string& dateTime);
 	int GetSerialNumber(long& value);
 	int Restart();
 	int SaveConfigurationToFlash();
 	int SetPiezoMode(const bool value);
+	int GetPiezoMode(bool& value);
 
 private:
 	bool initialized;
@@ -236,8 +280,15 @@ private:
 	/** Ensure each comms message is handled atomically */
 	MMThreadLock commsMutex;
 
+	/** Configuration preset group is being loaded */
+	bool configInProgress;
+
+	/** Single parameter is being updated */
+	bool singleChangeInProgress;
+
 	/** Objective currently selected */
 	long objectiveSelect;
+
 	bool servoInhibit;
 	bool digipotControlsOffset;
 	double offsetPositionUm;
@@ -249,6 +300,11 @@ private:
 	/* Lock out default copy operations */
 	PureFocus850AutoFocus(PureFocus850AutoFocus&);
 	PureFocus850AutoFocus& operator=(PureFocus850AutoFocus&);
+
+	/** Update properties in GUI for an objective slot
+	@param slot Objective slot (1-6)
+	*/
+	void UpdateObjectiveSlotProperties(const long slot);
 };
 
 

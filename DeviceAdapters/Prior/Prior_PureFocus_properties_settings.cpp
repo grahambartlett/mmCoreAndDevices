@@ -28,13 +28,13 @@ int PureFocus850AutoFocus::OnObjectiveSelect(MM::PropertyBase* pProp, MM::Action
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
 	{
-		if (initialized)
-		{
-			ret = GetObjective(objectiveSelect);
-		}
-
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		ret = GetObjective(objectiveSelect);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set(objectiveSelect);
@@ -49,20 +49,16 @@ int PureFocus850AutoFocus::OnObjectiveSelect(MM::PropertyBase* pProp, MM::Action
 		{
 			ret = ERR_INVALID_VALUE;
 		}
-		else if (initialized)
+		else
 		{
 			ret = SetObjective(value);
 			if (ret == DEVICE_OK)
 			{
 				objectiveSelect = value;
 			}
-			else
-			{
-				// Restore
-				pProp->Set(objectiveSelect);
-			}
 		}
-		else
+
+		if (ret != DEVICE_OK)
 		{
 			// Restore
 			pProp->Set(objectiveSelect);
@@ -81,13 +77,13 @@ int PureFocus850AutoFocus::OnServoInhibit(MM::PropertyBase* pProp, MM::ActionTyp
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
 	{
-		if (initialized)
-		{
-			ret = GetServoInhibit(servoInhibit);
-		}
-
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		ret = GetServoInhibit(servoInhibit);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set((long)servoInhibit);
@@ -102,7 +98,7 @@ int PureFocus850AutoFocus::OnServoInhibit(MM::PropertyBase* pProp, MM::ActionTyp
 		{
 			ret = ERR_INVALID_VALUE;
 		}
-		else if (initialized)
+		else
 		{
 			bool boolValue = (value != 0);
 			ret = SetServoInhibit(boolValue);
@@ -110,13 +106,9 @@ int PureFocus850AutoFocus::OnServoInhibit(MM::PropertyBase* pProp, MM::ActionTyp
 			{
 				servoInhibit = boolValue;
 			}
-			else
-			{
-				// Restore
-				pProp->Set((long)servoInhibit);
-			}
 		}
-		else
+
+		if (ret != DEVICE_OK)
 		{
 			// Restore
 			pProp->Set((long)servoInhibit);
@@ -135,13 +127,13 @@ int PureFocus850AutoFocus::OnDigipotControlsOffset(MM::PropertyBase* pProp, MM::
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
 	{
-		if (initialized)
-		{
-			ret = GetDigipotControlsOffset(digipotControlsOffset);
-		}
-
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		ret = GetDigipotControlsOffset(digipotControlsOffset);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set((long)digipotControlsOffset);
@@ -156,7 +148,7 @@ int PureFocus850AutoFocus::OnDigipotControlsOffset(MM::PropertyBase* pProp, MM::
 		{
 			ret = ERR_INVALID_VALUE;
 		}
-		else if (initialized)
+		else
 		{
 			bool boolValue = (value != 0);
 			ret = SetDigipotControlsOffset(boolValue);
@@ -164,13 +156,9 @@ int PureFocus850AutoFocus::OnDigipotControlsOffset(MM::PropertyBase* pProp, MM::
 			{
 				digipotControlsOffset = boolValue;
 			}
-			else
-			{
-				// Restore
-				pProp->Set((long)digipotControlsOffset);
-			}
 		}
-		else
+		
+		if (ret != DEVICE_OK)
 		{
 			// Restore
 			pProp->Set((long)digipotControlsOffset);
@@ -189,13 +177,13 @@ int PureFocus850AutoFocus::OnOffsetPositionUm(MM::PropertyBase* pProp, MM::Actio
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
 	{
-		if (initialized)
-		{
-			ret = GetOffsetPositionUm(offsetPositionUm);
-		}
-
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		ret = GetOffsetPositionUm(offsetPositionUm);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set(offsetPositionUm);
@@ -206,20 +194,13 @@ int PureFocus850AutoFocus::OnOffsetPositionUm(MM::PropertyBase* pProp, MM::Actio
 		double value;
 		pProp->Get(value);
 
-		if (initialized)
+		ret = SetOffsetPositionUm(value);
+		if (ret == DEVICE_OK)
 		{
-			ret = SetOffsetPositionUm(value);
-			if (ret == DEVICE_OK)
-			{
-				offsetPositionUm = value;
-			}
-			else
-			{
-				// Restore
-				pProp->Set(offsetPositionUm);
-			}
+			offsetPositionUm = value;
 		}
-		else
+
+		if (ret != DEVICE_OK)
 		{
 			// Restore
 			pProp->Set(offsetPositionUm);
@@ -238,13 +219,13 @@ int PureFocus850AutoFocus::OnFocusPositionUm(MM::PropertyBase* pProp, MM::Action
 {
 	int ret = DEVICE_OK;
 
-	if (eAct == MM::BeforeGet)
+	if (!initialized)
 	{
-		if (initialized)
-		{
-			ret = GetFocusPositionUm(focusPositionUm);
-		}
-
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		ret = GetFocusPositionUm(focusPositionUm);
 		if (ret == DEVICE_OK)
 		{
 			pProp->Set(focusPositionUm);
@@ -255,20 +236,13 @@ int PureFocus850AutoFocus::OnFocusPositionUm(MM::PropertyBase* pProp, MM::Action
 		double value;
 		pProp->Get(value);
 
-		if (initialized)
+		ret = SetFocusPositionUm(value);
+		if (ret == DEVICE_OK)
 		{
-			ret = SetFocusPositionUm(value);
-			if (ret == DEVICE_OK)
-			{
-				focusPositionUm = value;
-			}
-			else
-			{
-				// Restore
-				pProp->Set(focusPositionUm);
-			}
+			focusPositionUm = value;
 		}
-		else
+
+		if (ret != DEVICE_OK)
 		{
 			// Restore
 			pProp->Set(focusPositionUm);
