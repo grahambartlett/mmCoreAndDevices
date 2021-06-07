@@ -172,6 +172,7 @@
     <ClCompile Include="Prior_PureFocus_comms_SystemCommands.cpp" />
     <ClCompile Include="Prior_PureFocus_ObjectiveSlot.cpp" />
     <ClCompile Include="Prior_PureFocus_properties.cpp" />
+    <ClCompile Include="Prior_PureFocus_properties_global.cpp" />
     <ClCompile Include="Prior_PureFocus_properties_objective.cpp" />
     <ClCompile Include="Prior_PureFocus_properties_settings.cpp" />
     <ClCompile Include="Prior_PureFocus_properties_status.cpp" />

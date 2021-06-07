@@ -681,6 +681,7 @@ int PureFocus850AutoFocus::SetOutputLimits(const double min, const double max)
 	return ret;
 }
 
+
 int PureFocus850AutoFocus::GetOutputLimits(double& min, double& max)
 {
 	int ret = DEVICE_OK;

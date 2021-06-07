@@ -39,35 +39,30 @@ struct PureFocus850ObjectiveSlot
 {
 public:
 	std::string preset;
-	double pinholeCentre;
-	double pinholeWidth;
-	double laserPower;
-	double backgroundA;
-	double backgroundB;
-	double backgroundC;
-	double backgroundD;
+	double lensOffsets[5];
 	double kP;
 	double kI;
 	double kD;
-	bool servoDirectionSignIsPositive;
 	double outputLimitMin;
 	double outputLimitMax;
 	double sampleLowThreshold;
 	double focusLowThreshold;
 	double focusHighThreshold;
 	double focusRangeThreshold;
-	double inFocusRecoveryTimeMs;
 	double interfaceHighThreshold;
 	double interfaceLowThreshold;
-	bool focusServoInterruptOn;
+	double laserPower;
+	double backgroundA;
+	double backgroundB;
+	double backgroundC;
+	double backgroundD;
+	double regionStartD;
+	double regionEndD;
 	bool servoLimitOn;
-	double servoLimitMaxPositive;
-	double servoLimitMaxNegative;
-	bool isPiezoMotor;
-	double focusDriveRangeMicrons;
-	double maxFocusSpeedMicronsPerS;
-	double maxFocusAccelMicronsPerS2;
-	bool focusDriveDirectionSignIsPositive;
+	double servoLimitMaxPositiveMicrons;
+	double servoLimitMaxNegativeMicrons;
+	double pinholeCentre;
+	double pinholeWidth;
 
 	PureFocus850ObjectiveSlot();
 
@@ -84,10 +79,11 @@ public:
 	*/
 	bool getValidPresetName(std::string& presetName, unsigned long index);
 
-	/** Get default preset name
-	@param presetName Preset name
-	*/
-	void getDefaultPresetName(std::string& presetName);
+	/** Default preset name */
+	static const char *const defaultPresetName;
+
+	/** Custom preset name */
+	static const char *const customPresetName;
 };
 
 
@@ -118,44 +114,52 @@ public:
 
 	// Actions for properties stored in configuration per objective slot
 	int OnPreset(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnPinholeCentre(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnPinholeWidth(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnLaserPower(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnBackgroundA(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnBackgroundB(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnBackgroundC(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnBackgroundD(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
+	int OnLensOffset(MM::PropertyBase* pProp, MM::ActionType eAct, long slotAndLens);
 	int OnKP(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnKI(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnKD(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnServoDirectionSignIsPositive(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnOutputLimitMin(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnOutputLimitMax(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnSampleLowThreshold(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnFocusLowThreshold(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnFocusHighThreshold(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnFocusRangeThreshold(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnInFocusRecoveryTimeMs(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnInterfaceHighThreshold(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnInterfaceLowThreshold(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnFocusServoInterruptOn(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
+	int OnLaserPower(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
+	int OnBackgroundA(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
+	int OnBackgroundB(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
+	int OnBackgroundC(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
+	int OnBackgroundD(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
+	int OnRegionStartD(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
+	int OnRegionEndD(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
+	int OnPinholeCentre(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
+	int OnPinholeWidth(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnServoLimitOn(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnServoLimitMaxPositive(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
 	int OnServoLimitMaxNegative(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnIsPiezoMotor(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnFocusDriveRangeMicrons(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnMaxFocusSpeedMicronsPerS(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnMaxFocusAccelMicronsPerS2(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
-	int OnFocusDriveDirectionSignIsPositive(MM::PropertyBase* pProp, MM::ActionType eAct, long slot);
+
+	// Actions for global properties stored in configuration
+	int OnIsPiezoMotor(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnServoOn(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnServoInhibit(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnFocusInterruptOn(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnInterfaceInhibit(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnInterfaceInhibitCount(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnDigipotControlsOffset(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnIsServoDirectionPositive(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnIsFocusDriveDirectionPositive(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnExposureTimeUs(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnDigipotOffsetSpeedPercent(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnFocusDriveRangeMicrons(MM::PropertyBase* pProp, MM::ActionType eActy);
+	int OnInFocusRecoveryTimeMs(MM::PropertyBase* pProp, MM::ActionType eAct);
 
 	// Actions for properties used to sequence setting configuration values
 	int OnConfigInProgress(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnSingleChangeInProgress(MM::PropertyBase* pProp, MM::ActionType eAct);
 
-	// Actions for read/write settings properties not stored in configuration
+	// Actions for system control read/write properties not stored in configuration
 	int OnObjectiveSelect(MM::PropertyBase* pProp, MM::ActionType eAct);
-	int OnServoInhibit(MM::PropertyBase* pProp, MM::ActionType eAct);
-	int OnDigipotControlsOffset(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnOffsetPositionUm(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnFocusPositionUm(MM::PropertyBase* pProp, MM::ActionType eAct);
 
@@ -244,7 +248,6 @@ public:
 	int SetOffsetToStoredOffset(const long index);
 	int SetStoredOffsetToCurrentPosition(const long index);
 	int SetStoredOffsetUm(const long index, const double value);
-	int GetStoredOffsetUm(const long index, double& value);
 	int SetFocusDriveRange(const double value);
 	int GetFocusDriveRange(double& value);
 	int GetIsFocusDriveMoving(bool& value);
@@ -269,6 +272,12 @@ public:
 	int SaveConfigurationToFlash();
 	int SetPiezoMode(const bool value);
 	int GetPiezoMode(bool& value);
+	int SetRegionD(const double start, const double end);
+	int GetRegionD(double& start, double& end);
+	int SetInterfaceInhibit(const bool inhibit, const double count);
+	int GetInterfaceInhibit(bool& inhibit, double& count);
+	int SetExposureTimeUs(const double value);
+	int GetExposureTimeUs(double& value);
 
 private:
 	bool initialized;
@@ -286,16 +295,28 @@ private:
 	/** Single parameter is being updated */
 	bool singleChangeInProgress;
 
-	/** Objective currently selected */
-	long objectiveSelect;
-
-	bool servoInhibit;
-	bool digipotControlsOffset;
-	double offsetPositionUm;
-	double focusPositionUm;
-
 	/** Stored settings for each objective slot */
 	PureFocus850ObjectiveSlot objective[6];
+
+	/* Stored global settings */
+	bool isPiezoMotor;
+	bool servoOn;
+	bool servoInhibit;
+	bool focusInterruptOn;
+	bool interfaceInhibit;
+	double interfaceInhibitCount;
+	bool digipotControlsOffset;
+	bool isServoDirectionPositive;
+	bool isFocusDriveDirectionPositive;
+	double exposureTimeUs;
+	double digipotOffsetSpeedPercent;
+	double focusDriveRangeMicrons;
+	double inFocusRecoveryTimeMs;
+
+	/* Volatile control values */
+	long objectiveSelect;
+	double offsetPositionUm;
+	double focusPositionUm;
 
 	/* Lock out default copy operations */
 	PureFocus850AutoFocus(PureFocus850AutoFocus&);
@@ -311,6 +332,55 @@ private:
 	@returns DEVICE_OK if succeeded
 	*/
 	int SendObjectiveSlotProperties(const long slot);
+
+	/* Names of objective properties */
+	static char* propObjectivePrefix;
+	static char* propCurrentPrefix;
+	static char* propPreset;
+	static char* propLensOffset;
+	static char* propKP;
+	static char* propKI;
+	static char* propKD;
+	static char* propOutputLimitMinimum;
+	static char* propOutputLimitMaximum;
+	static char* propSampleLowThreshold;
+	static char* propFocusLowThreshold;
+	static char* propFocusHighThreshold;
+	static char* propFocusRangeThreshold;
+	static char* propInterfaceLowThreshold;
+	static char* propInterfaceHighThreshold;
+	static char* propLaserPower;
+	static char* propBackgroundA;
+	static char* propBackgroundB;
+	static char* propBackgroundC;
+	static char* propBackgroundD;
+	static char* propRegionStartD;
+	static char* propRegionEndD;
+	static char* propPinholeCentre;
+	static char* propPinholeWidth;
+	static char* propIsServoLimitOn;
+	static char* propServoLimitMaxPositiveMicrons;
+	static char* propServoLimitMaxNegativeMicrons;
+
+	/* Names of global properties */
+	static char* propIsPiezoMotor;
+	static char* propServoOn;
+	static char* propServoInhibit;
+	static char* propFocusInterruptOn;
+	static char* propInterfaceInhibit;
+	static char* propInterfaceInhibitCount;
+	static char* propDigipotControlsOffset;
+	static char* propIsServoDirectionPositive;
+	static char* propIsFocusDriveDirectionPositive;
+	static char* propExposureTimeUs;
+	static char* propDigipotOffsetSpeedPercent;
+	static char* propFocusDriveRangeMicrons;
+	static char* propInFocusRecoveryTimeMs;
+
+	/* Names of control flag properties */
+	static char* propConfigInProgress;
+	static char* propSingleChangeInProgress;
+
 };
 
 

@@ -24,54 +24,60 @@
 #include "prior_PureFocus.h"
 
 
+const char *const PureFocus850ObjectiveSlot::defaultPresetName = "Stepper - Default";
+const char *const PureFocus850ObjectiveSlot::customPresetName = "Custom";
+
+
 PureFocus850ObjectiveSlot::PureFocus850ObjectiveSlot()
 {
-	setPreset("Stepper - Default");
+	setPreset(defaultPresetName);
 }
 
 
 bool PureFocus850ObjectiveSlot::setPreset(const std::string& presetName)
 {
-	if (presetName.compare("Custom") == 0)
+	int i;
+	if (presetName.compare(customPresetName) == 0)
 	{
 		// Set name but leave everything else unchanged
-		preset.assign("Custom");
+		preset.assign(customPresetName);
 	}
 	else
 	{
 		// Fall back to stepper default for an invalid name
-		preset.assign("Stepper - Default");
-		pinholeCentre = 750;
-		pinholeWidth = 750;
-		laserPower = 0;
-		backgroundA = 0;
-		backgroundB = 0;
-		backgroundC = 0;
-		backgroundD = 0;
+		preset.assign(defaultPresetName);
+
+		for (i = 0; i < 5; i ++)
+		{
+			lensOffsets[i] = 0;
+		}
+
 		kP = 100000.00;
 		kI = 0;
 		kD = 0;
-		servoDirectionSignIsPositive = true;
+
 		outputLimitMin = -500000;
 		outputLimitMax = 500000;
 		sampleLowThreshold = 50000;
 		focusLowThreshold = 500;
 		focusHighThreshold = 4095;
 		focusRangeThreshold = 0.05;
-		inFocusRecoveryTimeMs = 1;
 		interfaceHighThreshold = 4095;
 		interfaceLowThreshold = 0;
-		focusServoInterruptOn = false,
+		laserPower = 0;
+		backgroundA = 0;
+		backgroundB = 0;
+		backgroundC = 0;
+		backgroundD = 0;
+		regionStartD = 0;
+		regionEndD = 0;
+		pinholeCentre = 750;
+		pinholeWidth = 750;
 		servoLimitOn = false,
-		servoLimitMaxPositive = 0;
-		servoLimitMaxNegative = 0;
-		isPiezoMotor = false;
-		focusDriveRangeMicrons = 100;
-		maxFocusSpeedMicronsPerS = 400;
-		maxFocusAccelMicronsPerS2 = 12000;
-		focusDriveDirectionSignIsPositive = true;
+		servoLimitMaxPositiveMicrons = 0;
+		servoLimitMaxNegativeMicrons = 0;
 
-		if (presetName.compare("Stepper - Default") != 0)
+		if (presetName.compare(defaultPresetName) != 0)
 		{
 			return false;
 		}
@@ -128,10 +134,4 @@ bool PureFocus850ObjectiveSlot::getValidPresetName(std::string& presetName, unsi
 		presetName.assign(presetNameList[index]);
 		return true;
 	}
-}
-
-
-void PureFocus850ObjectiveSlot::getDefaultPresetName(std::string& presetName)
-{
-	presetName.assign("Stepper - Default");
 }

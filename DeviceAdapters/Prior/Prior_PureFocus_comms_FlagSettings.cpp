@@ -1241,3 +1241,119 @@ int PureFocus850AutoFocus::GetServoLimit(bool& isActive, double& maxPositive, do
 
 	return ret;
 }
+
+
+int PureFocus850AutoFocus::SetInterfaceInhibit(const bool inhibit, const double count)
+{
+	int ret = DEVICE_OK;
+
+	commsMutex.Lock();
+
+	// First clear serial port from previous stuff
+	ret = Prior::ClearPort(*this, *GetCoreCallback(), port);
+
+	if (ret == DEVICE_OK)
+	{
+		// Send command
+		std::ostringstream command;
+		long countRounded = (long)(count + 0.5);
+		command << "INTERFACEI," << (long)inhibit << "," << countRounded;
+
+		ret = SendSerialCommand(port.c_str(), command.str().c_str(), "\r");
+
+		if (ret == DEVICE_OK)
+		{
+			// Block/wait for acknowledge, or until we time out
+			std::string answer;
+			ret = GetSerialAnswer(port.c_str(), "\r", answer);
+
+			if (ret == DEVICE_OK)
+			{
+				// Parse response
+				if ((answer.length() >= 1) && (answer[0] == '0'))
+				{
+					// Success
+				}
+				else if ((answer.length() > 2) && (answer[0] == 'E'))
+				{
+					int errNo = atoi(answer.substr(2).c_str());
+					ret = ERR_OFFSET + errNo;
+				}
+				else
+				{
+					ret = ERR_UNRECOGNIZED_ANSWER;
+				}
+			}
+		}
+	}
+
+	commsMutex.Unlock();
+
+	return ret;
+}
+
+
+int PureFocus850AutoFocus::GetInterfaceInhibit(bool& inhibit, double& count)
+{
+	int ret = DEVICE_OK;
+
+	commsMutex.Lock();
+
+	// First clear serial port from previous stuff
+	ret = Prior::ClearPort(*this, *GetCoreCallback(), port);
+
+	if (ret == DEVICE_OK)
+	{
+		// Send command
+		std::ostringstream command;
+		command << "INTERFACEI";
+
+		ret = SendSerialCommand(port.c_str(), command.str().c_str(), "\r");
+
+		if (ret == DEVICE_OK)
+		{
+			// Block/wait for acknowledge, or until we time out
+			std::string answer;
+			ret = GetSerialAnswer(port.c_str(), "\r", answer);
+
+			if (ret == DEVICE_OK)
+			{
+				// Parse response
+				if ((answer.length() > 2) && (answer[0] == 'E'))
+				{
+					int errNo = atoi(answer.substr(2).c_str());
+					ret = ERR_OFFSET + errNo;
+				}
+				else
+				{
+					// Check and tokenise response
+					size_t endA = 0;
+
+					endA = answer.find(',');
+					if ((endA == std::string::npos) || (endA == 0) || (endA >= (answer.length() - 1)))
+					{
+						ret = ERR_UNRECOGNIZED_ANSWER;
+					}
+
+					if (ret == DEVICE_OK)
+					{
+						long longInhibit = atoi(answer.substr(0, endA).c_str());
+						if ((longInhibit == 0) || (longInhibit == 1))
+						{
+							inhibit = (longInhibit != 0);
+							count = atof(answer.substr(endA + 1).c_str());
+						}
+						else
+						{
+							ret = ERR_UNRECOGNIZED_ANSWER;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	commsMutex.Unlock();
+
+	return ret;
+}

@@ -24,6 +24,195 @@
 #include "prior_PureFocus.h"
 
 
+int PureFocus850AutoFocus::OnConfigInProgress(MM::PropertyBase* pProp, MM::ActionType eAct)
+{
+	int ret = DEVICE_OK;
+
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		pProp->Set((long)configInProgress);
+	}
+	else if (eAct == MM::AfterSet)
+	{
+		long value;
+		pProp->Get(value);
+
+		if (value == 1)
+		{
+			/* Unit can continue running whilst we get updated configuration */
+			configInProgress = true;
+		}
+		else if (value == 0)
+		{
+			long objectiveSelected = 1;
+			long slot;
+
+			// After this, properties can only be changed for current objective
+			configInProgress = false;
+			
+			// Lock so that keypad cannot change settings during this
+			ret = SetKeypadLock(true);
+
+			// Save initial operating state for unit
+			if (ret == DEVICE_OK)
+			{
+				ret = GetObjective(objectiveSelected);
+			}
+
+			// Stop the system servoing, so that changing objective slots should have no effect
+			if (ret == DEVICE_OK)
+			{
+				ret = SetServoOn(false);
+			}
+
+			if (ret == DEVICE_OK)
+			{
+				ret = SetServoInhibit(false);
+			}
+
+			// Stepper/piezo mode must be set first, because it stomps over output limits
+			if (ret == DEVICE_OK)
+			{
+				ret = SetPiezoMode(isPiezoMotor);
+			}			
+
+			// Configure all objective slots
+			for (slot = 1; (slot <= 6) && (ret == DEVICE_OK); slot++)
+			{
+				if (ret == DEVICE_OK)
+				{
+					ret = SetObjective(slot);
+				}
+
+				ret = SendObjectiveSlotProperties(slot);
+			}
+
+			// Configure global settings
+			if (ret == DEVICE_OK)
+			{
+				ret = SetFocusServoInterruptOn(focusInterruptOn);
+			}		
+
+			if (ret == DEVICE_OK)
+			{
+				ret = SetInterfaceInhibit(interfaceInhibit, interfaceInhibitCount);
+			}
+
+			if (ret == DEVICE_OK)
+			{
+				ret = SetDigipotControlsOffset(digipotControlsOffset);
+			}
+
+			if (ret == DEVICE_OK)
+			{
+				ret = SetServoDirectionPositive(isServoDirectionPositive);
+			}
+
+			if (ret == DEVICE_OK)
+			{
+				ret = SetFocusDriveDirectionPositive(isFocusDriveDirectionPositive);
+			}
+
+			if (ret == DEVICE_OK)
+			{
+				ret = SetExposureTimeUs(exposureTimeUs);
+			}
+
+			if (ret == DEVICE_OK)
+			{
+				ret = SetDigipotOffsetSpeedPercent(digipotOffsetSpeedPercent);
+			}
+
+			if (ret == DEVICE_OK)
+			{
+				ret = SetFocusDriveRange(focusDriveRangeMicrons);
+			}
+
+			if (ret == DEVICE_OK)
+			{
+				ret = SetInFocusRecoveryTime(inFocusRecoveryTimeMs);
+			}
+
+			// Return to initial operating state
+			if (ret == DEVICE_OK)
+			{
+				ret = SetObjective(objectiveSelected);
+			}
+
+			// Start servoing if set by configuration
+			if (ret == DEVICE_OK)
+			{
+				ret = SetServoInhibit(servoInhibit);
+			}
+
+			if (ret == DEVICE_OK)
+			{
+				ret = SetServoOn(servoOn);
+			}
+
+			// Unlock keypad when complete
+			ret = SetKeypadLock(false);
+		}
+		else
+		{
+			// Restore value if invalid.  Do not report an error though.
+			pProp->Set((long)configInProgress);
+		}
+	}
+	else
+	{
+		// No action
+	}
+
+	return ret;
+}
+
+
+int PureFocus850AutoFocus::OnSingleChangeInProgress(MM::PropertyBase* pProp, MM::ActionType eAct)
+{
+	int ret = DEVICE_OK;
+
+	if (!initialized)
+	{
+		// Ignore request
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		pProp->Set((long)singleChangeInProgress);
+	}
+	else if (eAct == MM::AfterSet)
+	{
+		long value;
+		pProp->Get(value);
+
+		if (value == 1)
+		{
+			/* Unit can continue running whilst we get updated configuration */
+			singleChangeInProgress = true;
+		}
+		else if (value == 0)
+		{
+			singleChangeInProgress = false;
+		}
+		else
+		{
+			// Restore value if invalid.  Do not report an error though.
+			pProp->Set((long)singleChangeInProgress);
+		}
+	}
+	else
+	{
+		// No action
+	}
+
+	return ret;
+}
+
+
 int PureFocus850AutoFocus::OnObjectiveSelect(MM::PropertyBase* pProp, MM::ActionType eAct)
 {
 	int ret = DEVICE_OK;
@@ -62,106 +251,6 @@ int PureFocus850AutoFocus::OnObjectiveSelect(MM::PropertyBase* pProp, MM::Action
 		{
 			// Restore
 			pProp->Set(objectiveSelect);
-		}
-	}
-	else
-	{
-		// No action
-	}
-
-	return ret;
-}
-
-
-int PureFocus850AutoFocus::OnServoInhibit(MM::PropertyBase* pProp, MM::ActionType eAct)
-{
-	int ret = DEVICE_OK;
-
-	if (!initialized)
-	{
-		// Ignore request
-	}
-	else if (eAct == MM::BeforeGet)
-	{
-		ret = GetServoInhibit(servoInhibit);
-		if (ret == DEVICE_OK)
-		{
-			pProp->Set((long)servoInhibit);
-		}
-	}
-	else if (eAct == MM::AfterSet)
-	{
-		long value;
-		pProp->Get(value);
-
-		if ((value < 0) || (value > 1))
-		{
-			ret = ERR_INVALID_VALUE;
-		}
-		else
-		{
-			bool boolValue = (value != 0);
-			ret = SetServoInhibit(boolValue);
-			if (ret == DEVICE_OK)
-			{
-				servoInhibit = boolValue;
-			}
-		}
-
-		if (ret != DEVICE_OK)
-		{
-			// Restore
-			pProp->Set((long)servoInhibit);
-		}
-	}
-	else
-	{
-		// No action
-	}
-
-	return ret;
-}
-
-
-int PureFocus850AutoFocus::OnDigipotControlsOffset(MM::PropertyBase* pProp, MM::ActionType eAct)
-{
-	int ret = DEVICE_OK;
-
-	if (!initialized)
-	{
-		// Ignore request
-	}
-	else if (eAct == MM::BeforeGet)
-	{
-		ret = GetDigipotControlsOffset(digipotControlsOffset);
-		if (ret == DEVICE_OK)
-		{
-			pProp->Set((long)digipotControlsOffset);
-		}
-	}
-	else if (eAct == MM::AfterSet)
-	{
-		long value;
-		pProp->Get(value);
-
-		if ((value < 0) || (value > 1))
-		{
-			ret = ERR_INVALID_VALUE;
-		}
-		else
-		{
-			bool boolValue = (value != 0);
-			ret = SetDigipotControlsOffset(boolValue);
-			if (ret == DEVICE_OK)
-			{
-				digipotControlsOffset = boolValue;
-			}
-		}
-		
-		if (ret != DEVICE_OK)
-		{
-			// Restore
-			pProp->Set((long)digipotControlsOffset);
 		}
 	}
 	else

@@ -31,129 +31,123 @@
 
 void PureFocus850AutoFocus::UpdateObjectiveSlotProperties(const long slot)
 {
+	int j;
 	std::string propertyName;
-	std::string baseName = "Objective";
-	baseName.append(1, (char)('0' + slot));
-	baseName.append("-");
+	std::string baseName;
+	
+	if (slot == 0)
+	{
+		baseName = propCurrentPrefix;
+	}
+	else
+	{
+		baseName = propObjectivePrefix;
+		baseName.append(1, (char)('0' + slot));
+		baseName.append("-");
+
+		propertyName = baseName;
+		propertyName.append(propPreset);
+		UpdateProperty(propertyName.c_str());
+
+		for (j = 0; j < 5; j ++)
+		{
+			propertyName = baseName;
+			propertyName.append(propLensOffset);
+			baseName.append(1, (char)('0' + j));
+			UpdateProperty(propertyName.c_str());
+		}
+	}
 
 	propertyName = baseName;
-	propertyName.append("Preset");
+	propertyName.append(propKP);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("PinholeCentre");
+	propertyName.append(propKI);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("PinholeWidth");
+	propertyName.append(propKD);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("LaserPower");
+	propertyName.append(propOutputLimitMinimum);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("BackgroundA");
+	propertyName.append(propOutputLimitMaximum);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("BackgroundB");
+	propertyName.append(propSampleLowThreshold);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("BackgroundC");
+	propertyName.append(propFocusLowThreshold);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("BackgroundD");
+	propertyName.append(propFocusHighThreshold);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("KP");
+	propertyName.append(propFocusRangeThreshold);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("KI");
+	propertyName.append(propInterfaceHighThreshold);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("KD");
+	propertyName.append(propInterfaceLowThreshold);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("IsServoDirectionPositive");
+	propertyName.append(propLaserPower);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("OutputLimitMinimum");
+	propertyName.append(propBackgroundA);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("OutputLimitMaximum");
+	propertyName.append(propBackgroundB);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("SampleLowThreshold");
+	propertyName.append(propBackgroundC);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("FocusLowThreshold");
+	propertyName.append(propBackgroundD);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("FocusHighThreshold");
+	propertyName.append(propRegionStartD);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("FocusRangeThreshold");
+	propertyName.append(propRegionEndD);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("InFocusRecoveryTimeMs");
+	propertyName.append(propPinholeCentre);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("InterfaceHighThreshold");
+	propertyName.append(propPinholeWidth);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("InterfaceLowThreshold");
+	propertyName.append(propIsServoLimitOn);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("IsFocusServoInterruptOn");
+	propertyName.append(propServoLimitMaxPositiveMicrons);
 	UpdateProperty(propertyName.c_str());
 
 	propertyName = baseName;
-	propertyName.append("IsServoLimitOn");
-	UpdateProperty(propertyName.c_str());
-
-	propertyName = baseName;
-	propertyName.append("ServoLimitMaximumPositive");
-	UpdateProperty(propertyName.c_str());
-
-	propertyName = baseName;
-	propertyName.append("ServoLimitMaximumNegative");
-	UpdateProperty(propertyName.c_str());
-
-	propertyName = baseName;
-	propertyName.append("IsPiezoMotor");
-	UpdateProperty(propertyName.c_str());
-
-	propertyName = baseName;
-	propertyName.append("FocusDriveRangeMicrons");
-	UpdateProperty(propertyName.c_str());
-
-	propertyName = baseName;
-	propertyName.append("MaxFocusSpeedMicronsPerS");
-	UpdateProperty(propertyName.c_str());
-
-	propertyName = baseName;
-	propertyName.append("MaxFocusAccelMicronsPerS2");
-	UpdateProperty(propertyName.c_str());
-
-	propertyName = baseName;
-	propertyName.append("IsFocusDriveDirectionPositive");
+	propertyName.append(propServoLimitMaxNegativeMicrons);
 	UpdateProperty(propertyName.c_str());
 }
 
@@ -162,23 +156,14 @@ int PureFocus850AutoFocus::SendObjectiveSlotProperties(const long slot)
 {
 	int ret = DEVICE_OK;
 	int index = slot - 1;
+	int j;
 
-	if (ret == DEVICE_OK)
+	for (j = 0; j < 5; j ++)
 	{
-		ret = SetPinhole(objective[index].pinholeCentre, objective[index].pinholeWidth);
-	}
-
-	if (ret == DEVICE_OK)
-	{
-		ret = SetLaserPower(objective[index].laserPower);
-	}
-
-	if (ret == DEVICE_OK)
-	{
-		ret = SetBackgrounds(objective[index].backgroundA,
-			objective[index].backgroundB,
-			objective[index].backgroundC,
-			objective[index].backgroundD);
+		if (ret == DEVICE_OK)
+		{
+			ret = SetStoredOffsetUm(j, objective[index].lensOffsets[j]);
+		}
 	}
 
 	if (ret == DEVICE_OK)
@@ -194,11 +179,6 @@ int PureFocus850AutoFocus::SendObjectiveSlotProperties(const long slot)
 	if (ret == DEVICE_OK)
 	{
 		ret = SetKD(objective[index].kD);
-	}
-
-	if (ret == DEVICE_OK)
-	{
-		ret = SetServoDirectionPositive(objective[index].servoDirectionSignIsPositive);
 	}
 
 	if (ret == DEVICE_OK)
@@ -228,11 +208,6 @@ int PureFocus850AutoFocus::SendObjectiveSlotProperties(const long slot)
 
 	if (ret == DEVICE_OK)
 	{
-		ret = SetInFocusRecoveryTime(objective[index].inFocusRecoveryTimeMs);
-	}
-
-	if (ret == DEVICE_OK)
-	{
 		ret = SetInterfaceHighThreshold(objective[index].interfaceHighThreshold);
 	}
 
@@ -243,37 +218,31 @@ int PureFocus850AutoFocus::SendObjectiveSlotProperties(const long slot)
 
 	if (ret == DEVICE_OK)
 	{
-		ret = SetFocusServoInterruptOn(objective[index].focusServoInterruptOn);
+		ret = SetLaserPower(objective[index].laserPower);
 	}
 
 	if (ret == DEVICE_OK)
 	{
-		ret = SetServoLimit(objective[index].servoLimitOn, objective[index].servoLimitMaxPositive, objective[index].servoLimitMaxNegative);
+		ret = SetBackgrounds(objective[index].backgroundA,
+			objective[index].backgroundB,
+			objective[index].backgroundC,
+			objective[index].backgroundD);
 	}
 
 	if (ret == DEVICE_OK)
 	{
-		ret = SetPiezoMode(objective[index].isPiezoMotor);
+		ret = SetRegionD(objective[index].regionStartD,
+			objective[index].regionEndD);
 	}
 
 	if (ret == DEVICE_OK)
 	{
-		ret = SetFocusDriveRange(objective[index].focusDriveRangeMicrons);
+		ret = SetPinhole(objective[index].pinholeCentre, objective[index].pinholeWidth);
 	}
 
 	if (ret == DEVICE_OK)
 	{
-		ret = SetMaxFocusSpeedMicronsPerS(objective[index].maxFocusSpeedMicronsPerS);
-	}
-
-	if (ret == DEVICE_OK)
-	{
-		ret = SetMaxFocusAccelMicronsPerS2(objective[index].maxFocusAccelMicronsPerS2);
-	}
-
-	if (ret == DEVICE_OK)
-	{
-		ret = SetFocusDriveDirectionPositive(objective[index].focusDriveDirectionSignIsPositive);
+		ret = SetServoLimit(objective[index].servoLimitOn, objective[index].servoLimitMaxPositiveMicrons, objective[index].servoLimitMaxNegativeMicrons);
 	}
 
 	return ret;
@@ -404,7 +373,7 @@ int PureFocus850AutoFocus::OnPinholeCentre(MM::PropertyBase* pProp, MM::ActionTy
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].pinholeCentre);
@@ -454,13 +423,14 @@ int PureFocus850AutoFocus::OnPinholeCentre(MM::PropertyBase* pProp, MM::ActionTy
 							{
 								// Store new value locally
 								objective[slot - 1].pinholeCentre = value;							
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -524,7 +494,7 @@ int PureFocus850AutoFocus::OnPinholeWidth(MM::PropertyBase* pProp, MM::ActionTyp
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].pinholeWidth);
@@ -574,13 +544,14 @@ int PureFocus850AutoFocus::OnPinholeWidth(MM::PropertyBase* pProp, MM::ActionTyp
 							{
 								// Store new value locally
 								objective[slot - 1].pinholeWidth = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -644,7 +615,7 @@ int PureFocus850AutoFocus::OnLaserPower(MM::PropertyBase* pProp, MM::ActionType 
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].laserPower);
@@ -694,13 +665,14 @@ int PureFocus850AutoFocus::OnLaserPower(MM::PropertyBase* pProp, MM::ActionType 
 							{
 								// Store new value locally
 								objective[slot - 1].laserPower = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -764,7 +736,7 @@ int PureFocus850AutoFocus::OnBackgroundA(MM::PropertyBase* pProp, MM::ActionType
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].backgroundA);
@@ -817,13 +789,14 @@ int PureFocus850AutoFocus::OnBackgroundA(MM::PropertyBase* pProp, MM::ActionType
 							{
 								// Store new value locally
 								objective[slot - 1].backgroundA = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -887,7 +860,7 @@ int PureFocus850AutoFocus::OnBackgroundB(MM::PropertyBase* pProp, MM::ActionType
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].backgroundB);
@@ -940,13 +913,14 @@ int PureFocus850AutoFocus::OnBackgroundB(MM::PropertyBase* pProp, MM::ActionType
 							{
 								// Store new value locally
 								objective[slot - 1].backgroundB = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -1010,7 +984,7 @@ int PureFocus850AutoFocus::OnBackgroundC(MM::PropertyBase* pProp, MM::ActionType
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].backgroundC);
@@ -1063,13 +1037,14 @@ int PureFocus850AutoFocus::OnBackgroundC(MM::PropertyBase* pProp, MM::ActionType
 							{
 								// Store new value locally
 								objective[slot - 1].backgroundC = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -1133,7 +1108,7 @@ int PureFocus850AutoFocus::OnBackgroundD(MM::PropertyBase* pProp, MM::ActionType
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].backgroundD);
@@ -1186,13 +1161,14 @@ int PureFocus850AutoFocus::OnBackgroundD(MM::PropertyBase* pProp, MM::ActionType
 							{
 								// Store new value locally
 								objective[slot - 1].backgroundD = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -1256,7 +1232,7 @@ int PureFocus850AutoFocus::OnKP(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].kP);
@@ -1306,13 +1282,14 @@ int PureFocus850AutoFocus::OnKP(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 							{
 								// Store new value locally
 								objective[slot - 1].kP = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -1376,7 +1353,7 @@ int PureFocus850AutoFocus::OnKI(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].kI);
@@ -1426,13 +1403,14 @@ int PureFocus850AutoFocus::OnKI(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 							{
 								// Store new value locally
 								objective[slot - 1].kI = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -1496,7 +1474,7 @@ int PureFocus850AutoFocus::OnKD(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].kD);
@@ -1546,13 +1524,14 @@ int PureFocus850AutoFocus::OnKD(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 							{
 								// Store new value locally
 								objective[slot - 1].kD = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -1568,127 +1547,6 @@ int PureFocus850AutoFocus::OnKD(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 			{
 				// Revert displayed value on failure
 				pProp->Set(objective[slot - 1].kD);
-			}
-		}
-	}
-
-	return ret;
-}
-
-
-int PureFocus850AutoFocus::OnServoDirectionSignIsPositive(MM::PropertyBase* pProp, MM::ActionType eAct, long slot)
-{
-	int ret = DEVICE_OK;
-
-	if (!initialized)
-	{
-		// Ignore request
-	}
-	else if (eAct == MM::BeforeGet)
-	{
-		if (slot == 0)
-		{
-			// Current value
-			bool value;
-			ret = GetServoDirectionPositive(value);
-			if (ret == DEVICE_OK)
-			{
-				pProp->Set((long)value);
-			}
-		}
-		else if ((slot < 1) || (slot > 6))
-		{
-			// Invalid objective; should never happen
-			ret = DEVICE_INVALID_PROPERTY;
-		}
-		else
-		{
-			// Objective slot
-			pProp->Set((long)objective[slot - 1].servoDirectionSignIsPositive);
-		}
-	}
-	else if (eAct == MM::AfterSet)
-	{
-		if ((slot < 1) || (slot > 6))
-		{
-			// Invalid objective; should never happen
-			ret = DEVICE_INVALID_PROPERTY;
-		}
-		else if (configInProgress)
-		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
-			{
-				// Preserve value from preset
-				pProp->Set((long)objective[slot-1].servoDirectionSignIsPositive);
-			}
-			else
-			{
-				// Load property state from configuration
-				long value;
-				pProp->Get(value);
-				objective[slot - 1].servoDirectionSignIsPositive = (value != 0);
-			}
-		}
-		else if (!singleChangeInProgress)
-		{
-			// Revert displayed value
-			pProp->Set((long)objective[slot-1].servoDirectionSignIsPositive);
-		}
-		else
-		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
-			if (ret == DEVICE_OK)
-			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
-				if (ret == DEVICE_OK)
-				{
-					if (slot != objectiveSelect)
-					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
-					}
-					else
-					{
-						long value;
-						pProp->Get(value);
-						if ((value < 0) || (value > 1))
-						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							bool boolValue = (value != 0);
-							ret = SetServoDirectionPositive(boolValue);
-							if (ret == DEVICE_OK)
-							{
-								// Store new value locally
-								objective[slot - 1].servoDirectionSignIsPositive = boolValue;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
-									UpdateProperty(propertyName.c_str());
-								}
-							}
-						}
-					}
-				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
-			}
-
-			if (ret != DEVICE_OK)
-			{
-				// Revert displayed value on failure
-				pProp->Set((long)objective[slot - 1].servoDirectionSignIsPositive);
 			}
 		}
 	}
@@ -1737,7 +1595,7 @@ int PureFocus850AutoFocus::OnOutputLimitMin(MM::PropertyBase* pProp, MM::ActionT
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].outputLimitMin);
@@ -1787,13 +1645,14 @@ int PureFocus850AutoFocus::OnOutputLimitMin(MM::PropertyBase* pProp, MM::ActionT
 							{
 								// Store new value locally
 								objective[slot - 1].outputLimitMin = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -1857,7 +1716,7 @@ int PureFocus850AutoFocus::OnOutputLimitMax(MM::PropertyBase* pProp, MM::ActionT
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].outputLimitMax);
@@ -1907,13 +1766,14 @@ int PureFocus850AutoFocus::OnOutputLimitMax(MM::PropertyBase* pProp, MM::ActionT
 							{
 								// Store new value locally
 								objective[slot - 1].outputLimitMax = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -1977,7 +1837,7 @@ int PureFocus850AutoFocus::OnSampleLowThreshold(MM::PropertyBase* pProp, MM::Act
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].sampleLowThreshold);
@@ -2027,13 +1887,14 @@ int PureFocus850AutoFocus::OnSampleLowThreshold(MM::PropertyBase* pProp, MM::Act
 							{
 								// Store new value locally
 								objective[slot - 1].sampleLowThreshold = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -2097,7 +1958,7 @@ int PureFocus850AutoFocus::OnFocusLowThreshold(MM::PropertyBase* pProp, MM::Acti
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].focusLowThreshold);
@@ -2147,13 +2008,14 @@ int PureFocus850AutoFocus::OnFocusLowThreshold(MM::PropertyBase* pProp, MM::Acti
 							{
 								// Store new value locally
 								objective[slot - 1].focusLowThreshold = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -2217,7 +2079,7 @@ int PureFocus850AutoFocus::OnFocusHighThreshold(MM::PropertyBase* pProp, MM::Act
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].focusHighThreshold);
@@ -2267,13 +2129,14 @@ int PureFocus850AutoFocus::OnFocusHighThreshold(MM::PropertyBase* pProp, MM::Act
 							{
 								// Store new value locally
 								objective[slot - 1].focusHighThreshold = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -2337,7 +2200,7 @@ int PureFocus850AutoFocus::OnFocusRangeThreshold(MM::PropertyBase* pProp, MM::Ac
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].focusRangeThreshold);
@@ -2387,13 +2250,14 @@ int PureFocus850AutoFocus::OnFocusRangeThreshold(MM::PropertyBase* pProp, MM::Ac
 							{
 								// Store new value locally
 								objective[slot - 1].focusRangeThreshold = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -2409,126 +2273,6 @@ int PureFocus850AutoFocus::OnFocusRangeThreshold(MM::PropertyBase* pProp, MM::Ac
 			{
 				// Revert displayed value on failure
 				pProp->Set(objective[slot - 1].focusRangeThreshold);
-			}
-		}
-	}
-
-	return ret;
-}
-
-
-int PureFocus850AutoFocus::OnInFocusRecoveryTimeMs(MM::PropertyBase* pProp, MM::ActionType eAct, long slot)
-{
-	int ret = DEVICE_OK;
-
-	if (!initialized)
-	{
-		// Ignore request
-	}
-	else if (eAct == MM::BeforeGet)
-	{
-		if (slot == 0)
-		{
-			// Current value
-			double value;
-			ret = GetInFocusRecoveryTime(value);
-			if (ret == DEVICE_OK)
-			{
-				pProp->Set(value);
-			}
-		}
-		else if ((slot < 1) || (slot > 6))
-		{
-			// Invalid objective; should never happen
-			ret = DEVICE_INVALID_PROPERTY;
-		}
-		else
-		{
-			// Objective slot
-			pProp->Set(objective[slot - 1].inFocusRecoveryTimeMs);
-		}
-	}
-	else if (eAct == MM::AfterSet)
-	{
-		if ((slot < 1) || (slot > 6))
-		{
-			// Invalid objective; should never happen
-			ret = DEVICE_INVALID_PROPERTY;
-		}
-		else if (configInProgress)
-		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].inFocusRecoveryTimeMs);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].inFocusRecoveryTimeMs = value;
-			}
-		}
-		else if (!singleChangeInProgress)
-		{
-			// Revert displayed value
-			pProp->Set(objective[slot-1].inFocusRecoveryTimeMs);
-		}
-		else
-		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
-			if (ret == DEVICE_OK)
-			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
-				if (ret == DEVICE_OK)
-				{
-					if (slot != objectiveSelect)
-					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
-					}
-					else
-					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
-						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetInFocusRecoveryTime(value);
-							if (ret == DEVICE_OK)
-							{
-								// Store new value locally
-								objective[slot - 1].inFocusRecoveryTimeMs = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
-									UpdateProperty(propertyName.c_str());
-								}
-							}
-						}
-					}
-				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
-			}
-
-			if (ret != DEVICE_OK)
-			{
-				// Revert displayed value on failure
-				pProp->Set(objective[slot - 1].inFocusRecoveryTimeMs);
 			}
 		}
 	}
@@ -2577,7 +2321,7 @@ int PureFocus850AutoFocus::OnInterfaceHighThreshold(MM::PropertyBase* pProp, MM:
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].interfaceHighThreshold);
@@ -2627,13 +2371,14 @@ int PureFocus850AutoFocus::OnInterfaceHighThreshold(MM::PropertyBase* pProp, MM:
 							{
 								// Store new value locally
 								objective[slot - 1].interfaceHighThreshold = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -2697,7 +2442,7 @@ int PureFocus850AutoFocus::OnInterfaceLowThreshold(MM::PropertyBase* pProp, MM::
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set(objective[slot-1].interfaceLowThreshold);
@@ -2747,13 +2492,14 @@ int PureFocus850AutoFocus::OnInterfaceLowThreshold(MM::PropertyBase* pProp, MM::
 							{
 								// Store new value locally
 								objective[slot - 1].interfaceLowThreshold = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -2769,127 +2515,6 @@ int PureFocus850AutoFocus::OnInterfaceLowThreshold(MM::PropertyBase* pProp, MM::
 			{
 				// Revert displayed value on failure
 				pProp->Set(objective[slot - 1].interfaceLowThreshold);
-			}
-		}
-	}
-
-	return ret;
-}
-
-
-int PureFocus850AutoFocus::OnFocusServoInterruptOn(MM::PropertyBase* pProp, MM::ActionType eAct, long slot)
-{
-	int ret = DEVICE_OK;
-
-	if (!initialized)
-	{
-		// Ignore request
-	}
-	else if (eAct == MM::BeforeGet)
-	{
-		if (slot == 0)
-		{
-			// Current value
-			bool value;
-			ret = GetFocusServoInterruptOn(value);
-			if (ret == DEVICE_OK)
-			{
-				pProp->Set((long)value);
-			}
-		}
-		else if ((slot < 1) || (slot > 6))
-		{
-			// Invalid objective; should never happen
-			ret = DEVICE_INVALID_PROPERTY;
-		}
-		else
-		{
-			// Objective slot
-			pProp->Set((long)objective[slot - 1].focusServoInterruptOn);
-		}
-	}
-	else if (eAct == MM::AfterSet)
-	{
-		if ((slot < 1) || (slot > 6))
-		{
-			// Invalid objective; should never happen
-			ret = DEVICE_INVALID_PROPERTY;
-		}
-		else if (configInProgress)
-		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
-			{
-				// Preserve value from preset
-				pProp->Set((long)objective[slot-1].focusServoInterruptOn);
-			}
-			else
-			{
-				// Load property state from configuration
-				long value;
-				pProp->Get(value);
-				objective[slot - 1].focusServoInterruptOn = (value != 0);
-			}
-		}
-		else if (!singleChangeInProgress)
-		{
-			// Revert displayed value
-			pProp->Set((long)objective[slot-1].focusServoInterruptOn);
-		}
-		else
-		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
-			if (ret == DEVICE_OK)
-			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
-				if (ret == DEVICE_OK)
-				{
-					if (slot != objectiveSelect)
-					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
-					}
-					else
-					{
-						long value;
-						pProp->Get(value);
-						if ((value < 0) || (value > 1))
-						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							bool boolValue = (value != 0);
-							ret = SetFocusServoInterruptOn(boolValue);
-							if (ret == DEVICE_OK)
-							{
-								// Store new value locally
-								objective[slot - 1].focusServoInterruptOn = boolValue;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
-									UpdateProperty(propertyName.c_str());
-								}
-							}
-						}
-					}
-				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
-			}
-
-			if (ret != DEVICE_OK)
-			{
-				// Revert displayed value on failure
-				pProp->Set((long)objective[slot - 1].focusServoInterruptOn);
 			}
 		}
 	}
@@ -2939,7 +2564,7 @@ int PureFocus850AutoFocus::OnServoLimitOn(MM::PropertyBase* pProp, MM::ActionTyp
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
 				pProp->Set((long)objective[slot-1].servoLimitOn);
@@ -2985,18 +2610,19 @@ int PureFocus850AutoFocus::OnServoLimitOn(MM::PropertyBase* pProp, MM::ActionTyp
 						{
 							// Valid, so set value on controller
 							bool boolValue = (value != 0);
-							ret = SetServoLimit(boolValue, objective[slot - 1].servoLimitMaxPositive, objective[slot - 1].servoLimitMaxNegative);
+							ret = SetServoLimit(boolValue, objective[slot - 1].servoLimitMaxPositiveMicrons, objective[slot - 1].servoLimitMaxNegativeMicrons);
 							if (ret == DEVICE_OK)
 							{
 								// Store new value locally
 								objective[slot - 1].servoLimitOn = boolValue;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -3050,7 +2676,7 @@ int PureFocus850AutoFocus::OnServoLimitMaxPositive(MM::PropertyBase* pProp, MM::
 		else
 		{
 			// Objective slot
-			pProp->Set(objective[slot - 1].servoLimitMaxPositive);
+			pProp->Set(objective[slot - 1].servoLimitMaxPositiveMicrons);
 		}
 	}
 	else if (eAct == MM::AfterSet)
@@ -3062,23 +2688,23 @@ int PureFocus850AutoFocus::OnServoLimitMaxPositive(MM::PropertyBase* pProp, MM::
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
-				pProp->Set(objective[slot-1].servoLimitMaxPositive);
+				pProp->Set(objective[slot-1].servoLimitMaxPositiveMicrons);
 			}
 			else
 			{
 				// Load property state from configuration
 				double value;
 				pProp->Get(value);
-				objective[slot - 1].servoLimitMaxPositive = value;
+				objective[slot - 1].servoLimitMaxPositiveMicrons = value;
 			}
 		}
 		else if (!singleChangeInProgress)
 		{
 			// Revert displayed value
-			pProp->Set(objective[slot-1].servoLimitMaxPositive);
+			pProp->Set(objective[slot-1].servoLimitMaxPositiveMicrons);
 		}
 		else
 		{
@@ -3107,18 +2733,19 @@ int PureFocus850AutoFocus::OnServoLimitMaxPositive(MM::PropertyBase* pProp, MM::
 						else
 						{
 							// Valid, so set value on controller
-							ret = SetServoLimit(objective[slot - 1].servoLimitOn, value, objective[slot - 1].servoLimitMaxNegative);
+							ret = SetServoLimit(objective[slot - 1].servoLimitOn, value, objective[slot - 1].servoLimitMaxNegativeMicrons);
 							if (ret == DEVICE_OK)
 							{
 								// Store new value locally
-								objective[slot - 1].servoLimitMaxPositive = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								objective[slot - 1].servoLimitMaxPositiveMicrons = value;
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -3133,7 +2760,7 @@ int PureFocus850AutoFocus::OnServoLimitMaxPositive(MM::PropertyBase* pProp, MM::
 			if (ret != DEVICE_OK)
 			{
 				// Revert displayed value on failure
-				pProp->Set(objective[slot - 1].servoLimitMaxPositive);
+				pProp->Set(objective[slot - 1].servoLimitMaxPositiveMicrons);
 			}
 		}
 	}
@@ -3171,7 +2798,7 @@ int PureFocus850AutoFocus::OnServoLimitMaxNegative(MM::PropertyBase* pProp, MM::
 		else
 		{
 			// Objective slot
-			pProp->Set(objective[slot - 1].servoLimitMaxNegative);
+			pProp->Set(objective[slot - 1].servoLimitMaxNegativeMicrons);
 		}
 	}
 	else if (eAct == MM::AfterSet)
@@ -3183,23 +2810,23 @@ int PureFocus850AutoFocus::OnServoLimitMaxNegative(MM::PropertyBase* pProp, MM::
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
-				pProp->Set(objective[slot-1].servoLimitMaxNegative);
+				pProp->Set(objective[slot-1].servoLimitMaxNegativeMicrons);
 			}
 			else
 			{
 				// Load property state from configuration
 				double value;
 				pProp->Get(value);
-				objective[slot - 1].servoLimitMaxNegative = value;
+				objective[slot - 1].servoLimitMaxNegativeMicrons = value;
 			}
 		}
 		else if (!singleChangeInProgress)
 		{
 			// Revert displayed value
-			pProp->Set(objective[slot-1].servoLimitMaxNegative);
+			pProp->Set(objective[slot-1].servoLimitMaxNegativeMicrons);
 		}
 		else
 		{
@@ -3228,18 +2855,19 @@ int PureFocus850AutoFocus::OnServoLimitMaxNegative(MM::PropertyBase* pProp, MM::
 						else
 						{
 							// Valid, so set value on controller
-							ret = SetServoLimit(objective[slot - 1].servoLimitOn, objective[slot - 1].servoLimitMaxPositive, value);
+							ret = SetServoLimit(objective[slot - 1].servoLimitOn, objective[slot - 1].servoLimitMaxPositiveMicrons, value);
 							if (ret == DEVICE_OK)
 							{
 								// Store new value locally
-								objective[slot - 1].servoLimitMaxNegative = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								objective[slot - 1].servoLimitMaxNegativeMicrons = value;
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -3254,7 +2882,7 @@ int PureFocus850AutoFocus::OnServoLimitMaxNegative(MM::PropertyBase* pProp, MM::
 			if (ret != DEVICE_OK)
 			{
 				// Revert displayed value on failure
-				pProp->Set(objective[slot - 1].servoLimitMaxNegative);
+				pProp->Set(objective[slot - 1].servoLimitMaxNegativeMicrons);
 			}
 		}
 	}
@@ -3263,9 +2891,11 @@ int PureFocus850AutoFocus::OnServoLimitMaxNegative(MM::PropertyBase* pProp, MM::
 }
 
 
-int PureFocus850AutoFocus::OnIsPiezoMotor(MM::PropertyBase* pProp, MM::ActionType eAct, long slot)
+int PureFocus850AutoFocus::OnLensOffset(MM::PropertyBase* pProp, MM::ActionType eAct, long slotAndLens)
 {
 	int ret = DEVICE_OK;
+	long slot = slotAndLens & 0xFF;
+	long lens = (slotAndLens >> 8) & 0xFF;
 
 	if (!initialized)
 	{
@@ -3273,17 +2903,8 @@ int PureFocus850AutoFocus::OnIsPiezoMotor(MM::PropertyBase* pProp, MM::ActionTyp
 	}
 	else if (eAct == MM::BeforeGet)
 	{
-		if (slot == 0)
-		{
-			// Current value
-			bool value;
-			ret = GetPiezoMode(value);
-			if (ret == DEVICE_OK)
-			{
-				pProp->Set((long)value);
-			}
-		}
-		else if ((slot < 1) || (slot > 6))
+		// Note that lens offset settings do not have a "current" value
+		if ((slot < 1) || (slot > 6) || (lens < 0) || (lens > 4))
 		{
 			// Invalid objective; should never happen
 			ret = DEVICE_INVALID_PROPERTY;
@@ -3291,156 +2912,35 @@ int PureFocus850AutoFocus::OnIsPiezoMotor(MM::PropertyBase* pProp, MM::ActionTyp
 		else
 		{
 			// Objective slot
-			pProp->Set((long)objective[slot - 1].isPiezoMotor);
+			pProp->Set(objective[slot - 1].lensOffsets[lens]);
 		}
 	}
 	else if (eAct == MM::AfterSet)
 	{
-		if ((slot < 1) || (slot > 6))
+		if ((slot < 1) || (slot > 6) || (lens < 0) || (lens > 4))
 		{
 			// Invalid objective; should never happen
 			ret = DEVICE_INVALID_PROPERTY;
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
-				pProp->Set((long)objective[slot-1].isPiezoMotor);
-			}
-			else
-			{
-				// Load property state from configuration
-				long value;
-				pProp->Get(value);
-				objective[slot - 1].isPiezoMotor = (value != 0);
-			}
-		}
-		else if (!singleChangeInProgress)
-		{
-			// Revert displayed value
-			pProp->Set((long)objective[slot-1].isPiezoMotor);
-		}
-		else
-		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
-			if (ret == DEVICE_OK)
-			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
-				if (ret == DEVICE_OK)
-				{
-					if (slot != objectiveSelect)
-					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
-					}
-					else
-					{
-						long value;
-						pProp->Get(value);
-						if ((value < 0) || (value > 1))
-						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							bool boolValue = (value != 0);
-							ret = SetPiezoMode(boolValue);
-							if (ret == DEVICE_OK)
-							{
-								// Store new value locally
-								objective[slot - 1].isPiezoMotor = boolValue;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
-									UpdateProperty(propertyName.c_str());
-								}
-							}
-						}
-					}
-				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
-			}
-
-			if (ret != DEVICE_OK)
-			{
-				// Revert displayed value on failure
-				pProp->Set((long)objective[slot - 1].isPiezoMotor);
-			}
-		}
-	}
-
-	return ret;
-}
-
-
-int PureFocus850AutoFocus::OnFocusDriveRangeMicrons(MM::PropertyBase* pProp, MM::ActionType eAct, long slot)
-{
-	int ret = DEVICE_OK;
-
-	if (!initialized)
-	{
-		// Ignore request
-	}
-	else if (eAct == MM::BeforeGet)
-	{
-		if (slot == 0)
-		{
-			// Current value
-			double value;
-			ret = GetFocusDriveRange(value);
-			if (ret == DEVICE_OK)
-			{
-				pProp->Set(value);
-			}
-		}
-		else if ((slot < 1) || (slot > 6))
-		{
-			// Invalid objective; should never happen
-			ret = DEVICE_INVALID_PROPERTY;
-		}
-		else
-		{
-			// Objective slot
-			pProp->Set(objective[slot - 1].focusDriveRangeMicrons);
-		}
-	}
-	else if (eAct == MM::AfterSet)
-	{
-		if ((slot < 1) || (slot > 6))
-		{
-			// Invalid objective; should never happen
-			ret = DEVICE_INVALID_PROPERTY;
-		}
-		else if (configInProgress)
-		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].focusDriveRangeMicrons);
+				pProp->Set(objective[slot-1].lensOffsets[lens]);
 			}
 			else
 			{
 				// Load property state from configuration
 				double value;
 				pProp->Get(value);
-				objective[slot - 1].focusDriveRangeMicrons = value;
+				objective[slot - 1].lensOffsets[lens] = value;
 			}
 		}
 		else if (!singleChangeInProgress)
 		{
 			// Revert displayed value
-			pProp->Set(objective[slot-1].focusDriveRangeMicrons);
+			pProp->Set(objective[slot-1].lensOffsets[lens]);
 		}
 		else
 		{
@@ -3469,18 +2969,19 @@ int PureFocus850AutoFocus::OnFocusDriveRangeMicrons(MM::PropertyBase* pProp, MM:
 						else
 						{
 							// Valid, so set value on controller
-							ret = SetFocusDriveRange(value);
+							ret = SetStoredOffsetUm(lens, value);
 							if (ret == DEVICE_OK)
 							{
 								// Store new value locally
-								objective[slot - 1].focusDriveRangeMicrons = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								objective[slot - 1].lensOffsets[lens] = value;
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -3495,7 +2996,7 @@ int PureFocus850AutoFocus::OnFocusDriveRangeMicrons(MM::PropertyBase* pProp, MM:
 			if (ret != DEVICE_OK)
 			{
 				// Revert displayed value on failure
-				pProp->Set(objective[slot - 1].focusDriveRangeMicrons);
+				pProp->Set(objective[slot - 1].servoLimitMaxNegativeMicrons);
 			}
 		}
 	}
@@ -3503,8 +3004,7 @@ int PureFocus850AutoFocus::OnFocusDriveRangeMicrons(MM::PropertyBase* pProp, MM:
 	return ret;
 }
 
-
-int PureFocus850AutoFocus::OnMaxFocusSpeedMicronsPerS(MM::PropertyBase* pProp, MM::ActionType eAct, long slot)
+int PureFocus850AutoFocus::OnRegionStartD(MM::PropertyBase* pProp, MM::ActionType eAct, long slot)
 {
 	int ret = DEVICE_OK;
 
@@ -3517,11 +3017,11 @@ int PureFocus850AutoFocus::OnMaxFocusSpeedMicronsPerS(MM::PropertyBase* pProp, M
 		if (slot == 0)
 		{
 			// Current value
-			double value;
-			ret = GetMaxFocusSpeedMicronsPerS(value);
+			double start, end;
+			ret = GetRegionD(start, end);
 			if (ret == DEVICE_OK)
 			{
-				pProp->Set(value);
+				pProp->Set(start);
 			}
 		}
 		else if ((slot < 1) || (slot > 6))
@@ -3532,7 +3032,7 @@ int PureFocus850AutoFocus::OnMaxFocusSpeedMicronsPerS(MM::PropertyBase* pProp, M
 		else
 		{
 			// Objective slot
-			pProp->Set(objective[slot - 1].maxFocusSpeedMicronsPerS);
+			pProp->Set(objective[slot - 1].regionStartD);
 		}
 	}
 	else if (eAct == MM::AfterSet)
@@ -3544,23 +3044,23 @@ int PureFocus850AutoFocus::OnMaxFocusSpeedMicronsPerS(MM::PropertyBase* pProp, M
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
-				pProp->Set(objective[slot-1].maxFocusSpeedMicronsPerS);
+				pProp->Set(objective[slot-1].regionStartD);
 			}
 			else
 			{
 				// Load property state from configuration
 				double value;
 				pProp->Get(value);
-				objective[slot - 1].maxFocusSpeedMicronsPerS = value;
+				objective[slot - 1].regionStartD = value;
 			}
 		}
 		else if (!singleChangeInProgress)
 		{
 			// Revert displayed value
-			pProp->Set(objective[slot-1].maxFocusSpeedMicronsPerS);
+			pProp->Set(objective[slot-1].regionStartD);
 		}
 		else
 		{
@@ -3589,18 +3089,19 @@ int PureFocus850AutoFocus::OnMaxFocusSpeedMicronsPerS(MM::PropertyBase* pProp, M
 						else
 						{
 							// Valid, so set value on controller
-							ret = SetMaxFocusSpeedMicronsPerS(value);
+							ret = SetRegionD(value, objective[slot - 1].regionEndD);
 							if (ret == DEVICE_OK)
 							{
 								// Store new value locally
-								objective[slot - 1].maxFocusSpeedMicronsPerS = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								objective[slot - 1].regionStartD = value;
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -3615,7 +3116,7 @@ int PureFocus850AutoFocus::OnMaxFocusSpeedMicronsPerS(MM::PropertyBase* pProp, M
 			if (ret != DEVICE_OK)
 			{
 				// Revert displayed value on failure
-				pProp->Set(objective[slot - 1].maxFocusSpeedMicronsPerS);
+				pProp->Set(objective[slot - 1].regionStartD);
 			}
 		}
 	}
@@ -3624,7 +3125,7 @@ int PureFocus850AutoFocus::OnMaxFocusSpeedMicronsPerS(MM::PropertyBase* pProp, M
 }
 
 
-int PureFocus850AutoFocus::OnMaxFocusAccelMicronsPerS2(MM::PropertyBase* pProp, MM::ActionType eAct, long slot)
+int PureFocus850AutoFocus::OnRegionEndD(MM::PropertyBase* pProp, MM::ActionType eAct, long slot)
 {
 	int ret = DEVICE_OK;
 
@@ -3637,11 +3138,11 @@ int PureFocus850AutoFocus::OnMaxFocusAccelMicronsPerS2(MM::PropertyBase* pProp, 
 		if (slot == 0)
 		{
 			// Current value
-			double value;
-			ret = GetMaxFocusAccelMicronsPerS2(value);
+			double start, end;
+			ret = GetRegionD(start, end);
 			if (ret == DEVICE_OK)
 			{
-				pProp->Set(value);
+				pProp->Set(end);
 			}
 		}
 		else if ((slot < 1) || (slot > 6))
@@ -3652,7 +3153,7 @@ int PureFocus850AutoFocus::OnMaxFocusAccelMicronsPerS2(MM::PropertyBase* pProp, 
 		else
 		{
 			// Objective slot
-			pProp->Set(objective[slot - 1].maxFocusAccelMicronsPerS2);
+			pProp->Set(objective[slot - 1].regionEndD);
 		}
 	}
 	else if (eAct == MM::AfterSet)
@@ -3664,23 +3165,23 @@ int PureFocus850AutoFocus::OnMaxFocusAccelMicronsPerS2(MM::PropertyBase* pProp, 
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
+			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 			{
 				// Preserve value from preset
-				pProp->Set(objective[slot-1].maxFocusAccelMicronsPerS2);
+				pProp->Set(objective[slot-1].regionEndD);
 			}
 			else
 			{
 				// Load property state from configuration
 				double value;
 				pProp->Get(value);
-				objective[slot - 1].maxFocusAccelMicronsPerS2 = value;
+				objective[slot - 1].regionEndD = value;
 			}
 		}
 		else if (!singleChangeInProgress)
 		{
 			// Revert displayed value
-			pProp->Set(objective[slot-1].maxFocusAccelMicronsPerS2);
+			pProp->Set(objective[slot-1].regionEndD);
 		}
 		else
 		{
@@ -3709,18 +3210,19 @@ int PureFocus850AutoFocus::OnMaxFocusAccelMicronsPerS2(MM::PropertyBase* pProp, 
 						else
 						{
 							// Valid, so set value on controller
-							ret = SetMaxFocusAccelMicronsPerS2(value);
+							ret = SetRegionD(objective[slot - 1].regionStartD, value);
 							if (ret == DEVICE_OK)
 							{
 								// Store new value locally
-								objective[slot - 1].maxFocusAccelMicronsPerS2 = value;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
+								objective[slot - 1].regionEndD = value;
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
 									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
 									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
+									propertyName.append("-");
+									propertyName.append(propPreset);
 									UpdateProperty(propertyName.c_str());
 								}
 							}
@@ -3735,256 +3237,9 @@ int PureFocus850AutoFocus::OnMaxFocusAccelMicronsPerS2(MM::PropertyBase* pProp, 
 			if (ret != DEVICE_OK)
 			{
 				// Revert displayed value on failure
-				pProp->Set(objective[slot - 1].maxFocusAccelMicronsPerS2);
+				pProp->Set(objective[slot - 1].regionEndD);
 			}
 		}
-	}
-
-	return ret;
-}
-
-
-int PureFocus850AutoFocus::OnFocusDriveDirectionSignIsPositive(MM::PropertyBase* pProp, MM::ActionType eAct, long slot)
-{
-	int ret = DEVICE_OK;
-
-	if (!initialized)
-	{
-		// Ignore request
-	}
-	else if (eAct == MM::BeforeGet)
-	{
-		if (slot == 0)
-		{
-			// Current value
-			bool value;
-			ret = GetFocusDriveDirectionPositive(value);
-			if (ret == DEVICE_OK)
-			{
-				pProp->Set((long)value);
-			}
-		}
-		else if ((slot < 1) || (slot > 6))
-		{
-			// Invalid objective; should never happen
-			ret = DEVICE_INVALID_PROPERTY;
-		}
-		else
-		{
-			// Objective slot
-			pProp->Set((long)objective[slot - 1].focusDriveDirectionSignIsPositive);
-		}
-	}
-	else if (eAct == MM::AfterSet)
-	{
-		if ((slot < 1) || (slot > 6))
-		{
-			// Invalid objective; should never happen
-			ret = DEVICE_INVALID_PROPERTY;
-		}
-		else if (configInProgress)
-		{
-			if (objective[slot - 1].preset.compare("Custom") != 0)
-			{
-				// Preserve value from preset
-				pProp->Set((long)objective[slot-1].focusDriveDirectionSignIsPositive);
-			}
-			else
-			{
-				// Load property state from configuration
-				long value;
-				pProp->Get(value);
-				objective[slot - 1].focusDriveDirectionSignIsPositive = (value != 0);
-			}
-		}
-		else if (!singleChangeInProgress)
-		{
-			// Revert displayed value
-			pProp->Set((long)objective[slot-1].focusDriveDirectionSignIsPositive);
-		}
-		else
-		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
-			if (ret == DEVICE_OK)
-			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
-				if (ret == DEVICE_OK)
-				{
-					if (slot != objectiveSelect)
-					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
-					}
-					else
-					{
-						long value;
-						pProp->Get(value);
-						if ((value < 0) || (value > 1))
-						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							bool boolValue = (value != 0);
-							ret = SetFocusDriveDirectionPositive(boolValue);
-							if (ret == DEVICE_OK)
-							{
-								// Store new value locally
-								objective[slot - 1].focusDriveDirectionSignIsPositive = boolValue;
-								if (objective[slot - 1].preset.compare("Custom") != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign("Custom");
-									std::string propertyName("Objective");
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-Preset");
-									UpdateProperty(propertyName.c_str());
-								}
-							}
-						}
-					}
-				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
-			}
-
-			if (ret != DEVICE_OK)
-			{
-				// Revert displayed value on failure
-				pProp->Set((long)objective[slot - 1].focusDriveDirectionSignIsPositive);
-			}
-		}
-	}
-
-	return ret;
-}
-
-
-int PureFocus850AutoFocus::OnConfigInProgress(MM::PropertyBase* pProp, MM::ActionType eAct)
-{
-	int ret = DEVICE_OK;
-
-	if (!initialized)
-	{
-		// Ignore request
-	}
-	else if (eAct == MM::BeforeGet)
-	{
-		pProp->Set((long)configInProgress);
-	}
-	else if (eAct == MM::AfterSet)
-	{
-		long value;
-		pProp->Get(value);
-
-		if (value == 1)
-		{
-			/* Unit can continue running whilst we get updated configuration */
-			configInProgress = true;
-		}
-		else if (value == 0)
-		{
-			bool isServoing = false;
-			long objectiveSelected = 1;
-			long slot;
-
-			// After this, properties can only be changed for current objective
-			configInProgress = false;
-			
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
-
-			// Save initial operating state for unit
-			if (ret == DEVICE_OK)
-			{
-				ret = GetServoOn(isServoing);
-			}
-
-			if (ret == DEVICE_OK)
-			{
-				ret = GetObjective(objectiveSelected);
-			}
-
-			// Configure all objective slots
-			for (slot = 1; (slot <= 6) && (ret == DEVICE_OK); slot++)
-			{
-				if (ret == DEVICE_OK)
-				{
-					ret = SetObjective(slot);
-				}
-
-				ret = SendObjectiveSlotProperties(slot);
-			}
-
-			// Return to initial operating state
-			if (ret == DEVICE_OK)
-			{
-				ret = SetObjective(objectiveSelected);
-			}
-
-			if (ret == DEVICE_OK)
-			{
-				ret = SetServoOn(isServoing);
-			}
-
-			// Unlock keypad when complete
-			ret = SetKeypadLock(false);
-		}
-		else
-		{
-			// Restore value if invalid.  Do not report an error though.
-			pProp->Set((long)configInProgress);
-		}
-	}
-	else
-	{
-		// No action
-	}
-
-	return ret;
-}
-
-
-int PureFocus850AutoFocus::OnSingleChangeInProgress(MM::PropertyBase* pProp, MM::ActionType eAct)
-{
-	int ret = DEVICE_OK;
-
-	if (!initialized)
-	{
-		// Ignore request
-	}
-	else if (eAct == MM::BeforeGet)
-	{
-		pProp->Set((long)singleChangeInProgress);
-	}
-	else if (eAct == MM::AfterSet)
-	{
-		long value;
-		pProp->Get(value);
-
-		if (value == 1)
-		{
-			/* Unit can continue running whilst we get updated configuration */
-			singleChangeInProgress = true;
-		}
-		else if (value == 0)
-		{
-			singleChangeInProgress = false;
-		}
-		else
-		{
-			// Restore value if invalid.  Do not report an error though.
-			pProp->Set((long)singleChangeInProgress);
-		}
-	}
-	else
-	{
-		// No action
 	}
 
 	return ret;

@@ -45,7 +45,9 @@ int PureFocus850AutoFocus::SetPinhole(const double centre, const double width)
 	{
 		// Send command
 		std::ostringstream command;
-		command << "PINHOLE," << (long)centre << "," << (long)width;
+		long centreRounded = (long)(centre + 0.5);
+		long widthRounded = (long)(width + 0.5);
+		command << "PINHOLE," << centreRounded << "," << widthRounded;
 
 		ret = SendSerialCommand(port.c_str(), command.str().c_str(), "\r");
 
@@ -152,7 +154,8 @@ int PureFocus850AutoFocus::SetLaserPower(const double value)
 	{
 		// Send command
 		std::ostringstream command;
-		command << "LASER," << (long)value;
+		long valueRounded = (long)(value + 0.5);
+		command << "LASER," << valueRounded;
 
 		ret = SendSerialCommand(port.c_str(), command.str().c_str(), "\r");
 
@@ -246,7 +249,11 @@ int PureFocus850AutoFocus::SetBackgrounds(const double a, const double b, const 
 	{
 		// Send command
 		std::ostringstream command;
-		command << "BACKGROUND," << (long)a << "," << (long)b << "," << (long)c << "," << (long)d;
+		long aRounded = (long)(a + 0.5);
+		long bRounded = (long)(b + 0.5);
+		long cRounded = (long)(c + 0.5);
+		long dRounded = (long)(d + 0.5);
+		command << "BACKGROUND," << aRounded << "," << bRounded << "," << cRounded << "," << dRounded;
 
 		ret = SendSerialCommand(port.c_str(), command.str().c_str(), "\r");
 
@@ -360,6 +367,202 @@ int PureFocus850AutoFocus::GetBackgrounds(double& a, double& b, double& c, doubl
 						d = atof(answer.substr(endC + 1).c_str());
 					}
 				}
+			}
+		}
+	}
+
+	commsMutex.Unlock();
+
+	return ret;
+}
+
+
+int PureFocus850AutoFocus::SetRegionD(const double start, const double end)
+{
+	int ret = DEVICE_OK;
+
+	commsMutex.Lock();
+
+	// First clear serial port from previous stuff
+	ret = Prior::ClearPort(*this, *GetCoreCallback(), port);
+
+	if (ret == DEVICE_OK)
+	{
+		// Send command
+		std::ostringstream command;
+		long startRounded = (long)(start + 0.5);
+		long endRounded = (long)(end + 0.5);
+		command << "REGION,D," << startRounded << "," << endRounded;
+
+		ret = SendSerialCommand(port.c_str(), command.str().c_str(), "\r");
+
+		if (ret == DEVICE_OK)
+		{
+			// Block/wait for acknowledge, or until we time out
+			std::string answer;
+			ret = GetSerialAnswer(port.c_str(), "\r", answer);
+
+			if (ret == DEVICE_OK)
+			{
+				// Parse response
+				if (answer.find("REGION,D,") != std::string::npos)
+				{
+					// Success
+				}
+				else if ((answer.length() > 2) && (answer[0] == 'E'))
+				{
+					int errNo = atoi(answer.substr(2).c_str());
+					ret = ERR_OFFSET + errNo;
+				}
+				else
+				{
+					ret = ERR_UNRECOGNIZED_ANSWER;
+				}
+			}
+		}
+	}
+
+	commsMutex.Unlock();
+
+	return ret;
+}
+
+
+int PureFocus850AutoFocus::GetRegionD(double& start, double& end)
+{
+	int ret = DEVICE_OK;
+
+	commsMutex.Lock();
+
+	// First clear serial port from previous stuff
+	ret = Prior::ClearPort(*this, *GetCoreCallback(), port);
+
+	if (ret == DEVICE_OK)
+	{
+		// Send command
+		std::ostringstream command;
+		command << "REGION,D";
+
+		ret = SendSerialCommand(port.c_str(), command.str().c_str(), "\r");
+
+		if (ret == DEVICE_OK)
+		{
+			// Block/wait for acknowledge, or until we time out
+			std::string answer;
+			ret = GetSerialAnswer(port.c_str(), "\r", answer);
+
+			if (ret == DEVICE_OK)
+			{
+				// Parse response
+				if ((answer.length() > 2) && (answer[0] == 'E'))
+				{
+					int errNo = atoi(answer.substr(2).c_str());
+					ret = ERR_OFFSET + errNo;
+				}
+				else
+				{
+					// Check and tokenise response
+					size_t endA = 0;
+
+					endA = answer.find(',');
+					if ((endA == std::string::npos) || (endA == 0) || (endA >= (answer.length() - 1)))
+					{
+						ret = ERR_UNRECOGNIZED_ANSWER;
+					}
+
+					if (ret == DEVICE_OK)
+					{
+						start = atof(answer.substr(0, endA).c_str());
+						end = atof(answer.substr(endA + 1).c_str());
+					}
+				}
+			}
+		}
+	}
+
+	commsMutex.Unlock();
+
+	return ret;
+}
+
+
+int PureFocus850AutoFocus::SetExposureTimeUs(const double value)
+{
+	int ret = DEVICE_OK;
+
+	commsMutex.Lock();
+
+	// First clear serial port from previous stuff
+	ret = Prior::ClearPort(*this, *GetCoreCallback(), port);
+
+	if (ret == DEVICE_OK)
+	{
+		// Send command
+		std::ostringstream command;
+		long valueRounded = (long)(value + 0.5);
+		command << "EXPOSURE," << valueRounded;
+
+		ret = SendSerialCommand(port.c_str(), command.str().c_str(), "\r");
+
+		if (ret == DEVICE_OK)
+		{
+			// Block/wait for acknowledge, or until we time out
+			std::string answer;
+			ret = GetSerialAnswer(port.c_str(), "\r", answer);
+
+			if (ret == DEVICE_OK)
+			{
+				// Parse response
+				if ((answer.length() >= 1) && (answer[0] == '0'))
+				{
+					// Success
+				}
+				else if ((answer.length() > 2) && (answer[0] == 'E'))
+				{
+					int errNo = atoi(answer.substr(2).c_str());
+					ret = ERR_OFFSET + errNo;
+				}
+				else
+				{
+					ret = ERR_UNRECOGNIZED_ANSWER;
+				}
+			}
+		}
+	}
+
+	commsMutex.Unlock();
+
+	return ret;
+}
+
+
+int PureFocus850AutoFocus::GetExposureTimeUs(double& value)
+{
+	int ret = DEVICE_OK;
+
+	commsMutex.Lock();
+
+	// First clear serial port from previous stuff
+	ret = Prior::ClearPort(*this, *GetCoreCallback(), port);
+
+	if (ret == DEVICE_OK)
+	{
+		// Send command
+		std::ostringstream command;
+		command << "EXPOSURE";
+
+		ret = SendSerialCommand(port.c_str(), command.str().c_str(), "\r");
+
+		if (ret == DEVICE_OK)
+		{
+			// Block/wait for acknowledge, or until we time out
+			std::string answer;
+			ret = GetSerialAnswer(port.c_str(), "\r", answer);
+
+			if (ret == DEVICE_OK)
+			{
+				// Parse response
+				value = atof(answer.c_str());
 			}
 		}
 	}
