@@ -421,17 +421,24 @@ int PureFocus850AutoFocus::OnPinholeCentre(MM::PropertyBase* pProp, MM::ActionTy
 							ret = SetPinhole(value, objective[slot - 1].pinholeWidth);
 							if (ret == DEVICE_OK)
 							{
-								// Store new value locally
-								objective[slot - 1].pinholeCentre = value;							
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
+								// Changing one value can change the other, so read both back
+								double centre, width;
+								ret = GetPinhole(centre, width);
+								if (ret == DEVICE_OK)
 								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
+									// Store new values locally
+									objective[slot - 1].pinholeCentre = centre;		
+									objective[slot - 1].pinholeWidth = width;	
+									if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
+									{
+										// This is now a custom setting
+										objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+										std::string propertyName(propObjectivePrefix);
+										propertyName.append(1, (char)('0' + slot));
+										propertyName.append("-");
+										propertyName.append(propPreset);
+										UpdateProperty(propertyName.c_str());
+									}
 								}
 							}
 						}
@@ -542,17 +549,24 @@ int PureFocus850AutoFocus::OnPinholeWidth(MM::PropertyBase* pProp, MM::ActionTyp
 							ret = SetPinhole(objective[slot - 1].pinholeCentre, value);
 							if (ret == DEVICE_OK)
 							{
-								// Store new value locally
-								objective[slot - 1].pinholeWidth = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
+								// Changing one value can change the other, so read both back
+								double centre, width;
+								ret = GetPinhole(centre, width);
+								if (ret == DEVICE_OK)
 								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
+									// Store new values locally
+									objective[slot - 1].pinholeCentre = centre;		
+									objective[slot - 1].pinholeWidth = width;	
+									if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
+									{
+										// This is now a custom setting
+										objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+										std::string propertyName(propObjectivePrefix);
+										propertyName.append(1, (char)('0' + slot));
+										propertyName.append("-");
+										propertyName.append(propPreset);
+										UpdateProperty(propertyName.c_str());
+									}
 								}
 							}
 						}

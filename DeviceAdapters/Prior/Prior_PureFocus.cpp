@@ -109,7 +109,7 @@ offsetPositionUm(0.0),
 focusPositionUm(0.0),
 
 // Config/setting updates
-configInProgress(true),
+configInProgress(false),
 singleChangeInProgress(false)
 
 {
@@ -452,7 +452,7 @@ singleChangeInProgress(false)
 	}
 
 	// Global settings, stored in configuration
-	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnConfigInProgress);
+	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnIsPiezoMotor);
 	CreateProperty(propIsPiezoMotor, "1", MM::Integer, false, action);
 	SetPropertyLimits(propIsPiezoMotor, 0, 1);
 
@@ -474,7 +474,7 @@ singleChangeInProgress(false)
 
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnInterfaceInhibitCount);
 	CreateProperty(propInterfaceInhibitCount, "0", MM::Float, false, action);
-	SetPropertyLimits(propInterfaceInhibitCount, 0, 1);
+	SetPropertyLimits(propInterfaceInhibitCount, 0, 255);
 
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnDigipotControlsOffset);
 	CreateProperty(propDigipotControlsOffset, "0", MM::Integer, false, action);
@@ -490,11 +490,11 @@ singleChangeInProgress(false)
 
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnExposureTimeUs);
 	CreateProperty(propExposureTimeUs, "0", MM::Float, false, action);
-	SetPropertyLimits(propExposureTimeUs, 0, 1);
+	SetPropertyLimits(propExposureTimeUs, 0, 100000000);
 
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnDigipotOffsetSpeedPercent);
 	CreateProperty(propDigipotOffsetSpeedPercent, "0", MM::Float, false, action);
-	SetPropertyLimits(propDigipotOffsetSpeedPercent, 0, 1);
+	SetPropertyLimits(propDigipotOffsetSpeedPercent, 0, 100);
 
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnFocusDriveRangeMicrons);
 	CreateProperty(propFocusDriveRangeMicrons, "0", MM::Float, false, action);
@@ -502,7 +502,7 @@ singleChangeInProgress(false)
 
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnInFocusRecoveryTimeMs);
 	CreateProperty(propInFocusRecoveryTimeMs, "0", MM::Float, false, action);
-	SetPropertyLimits(propInFocusRecoveryTimeMs, 0, 1);
+	SetPropertyLimits(propInFocusRecoveryTimeMs, 0, 100000);
 
 	// Volatile settings read back from unit, not stored in configuration.
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnConfigInProgress);

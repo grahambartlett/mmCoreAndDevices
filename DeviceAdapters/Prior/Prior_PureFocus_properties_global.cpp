@@ -97,7 +97,7 @@ int PureFocus850AutoFocus::OnIsPiezoMotor(MM::PropertyBase* pProp, MM::ActionTyp
 					// Store new value locally
 					isPiezoMotor = boolValue;
 
-					// Read back new output limits
+					// Read back new output limits, which change when this is changed
 					ret = GetOutputLimits(min, max);
 					if (ret == DEVICE_OK)
 					{
@@ -780,7 +780,7 @@ int PureFocus850AutoFocus::OnDigipotOffsetSpeedPercent(MM::PropertyBase* pProp, 
 		{
 			// Read state
 			double value;
-			ret = GetExposureTimeUs(value);
+			ret = GetDigipotOffsetSpeedPercent(value);
 			if (ret == DEVICE_OK)
 			{
 				digipotOffsetSpeedPercent = value;
