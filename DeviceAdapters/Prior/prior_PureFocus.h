@@ -323,9 +323,10 @@ private:
 	PureFocus850AutoFocus& operator=(PureFocus850AutoFocus&);
 
 	/** Update properties in GUI for an objective slot
-	@param slot Objective slot (1-6)
+	@param slot Objective slot (0-6)
+	@returns DEVICE_OK if succeeded
 	*/
-	void UpdateObjectiveSlotProperties(const long slot);
+	int UpdateObjectiveSlotProperties(const long slot);
 
 	/** Send properties to PF850 for an objective slot
 	@param slot Objective slot (1-6)
@@ -381,6 +382,23 @@ private:
 	static char* propConfigInProgress;
 	static char* propSingleChangeInProgress;
 
+	/* Names of volatile settings not saved */
+	static char* propObjective;
+	static char* propOffsetPositionMicrons;
+	static char* propFocusPositionMicrons;
+
+	/* Names of status values read back */
+	static char* propCalculationABCD;
+	static char* propFocusPidTarget;
+	static char* propFocusPidPosition;
+	static char* propFocusPidError;
+	static char* propFocusPidOutput;
+	static char* propFocusState;
+	static char* propTimeToInFocus;
+	static char* propIsOffsetMoving;
+	static char* propIsFocusDriveMoving;
+	static char* propPositiveLimitSwitch;
+	static char* propNegativeLimitSwitch;
 };
 
 

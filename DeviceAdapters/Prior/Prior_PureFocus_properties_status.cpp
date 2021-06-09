@@ -32,7 +32,8 @@ int PureFocus850AutoFocus::OnCalculationABCD(MM::PropertyBase* pProp, MM::Action
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set("0,0,0,0");
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -56,7 +57,8 @@ int PureFocus850AutoFocus::OnFocusPidPosition(MM::PropertyBase* pProp, MM::Actio
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -78,7 +80,8 @@ int PureFocus850AutoFocus::OnFocusPidError(MM::PropertyBase* pProp, MM::ActionTy
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -100,7 +103,8 @@ int PureFocus850AutoFocus::OnFocusPidOutput(MM::PropertyBase* pProp, MM::ActionT
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -122,7 +126,8 @@ int PureFocus850AutoFocus::OnFocusPidTarget(MM::PropertyBase* pProp, MM::ActionT
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -144,7 +149,8 @@ int PureFocus850AutoFocus::OnFocusState(MM::PropertyBase* pProp, MM::ActionType 
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -166,7 +172,8 @@ int PureFocus850AutoFocus::OnTimeToInFocus(MM::PropertyBase* pProp, MM::ActionTy
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -188,7 +195,8 @@ int PureFocus850AutoFocus::OnInterfaceCorrect(MM::PropertyBase* pProp, MM::Actio
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -210,7 +218,8 @@ int PureFocus850AutoFocus::OnIsOffsetMoving(MM::PropertyBase* pProp, MM::ActionT
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -232,7 +241,8 @@ int PureFocus850AutoFocus::OnIsFocusDriveMoving(MM::PropertyBase* pProp, MM::Act
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -254,7 +264,8 @@ int PureFocus850AutoFocus::OnPositiveLimitSwitch(MM::PropertyBase* pProp, MM::Ac
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -276,7 +287,8 @@ int PureFocus850AutoFocus::OnNegativeLimitSwitch(MM::PropertyBase* pProp, MM::Ac
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{

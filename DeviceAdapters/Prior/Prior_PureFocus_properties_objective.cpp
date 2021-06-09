@@ -29,11 +29,12 @@
 #include <stdio.h>
 
 
-void PureFocus850AutoFocus::UpdateObjectiveSlotProperties(const long slot)
+int PureFocus850AutoFocus::UpdateObjectiveSlotProperties(const long slot)
 {
 	int j;
 	std::string propertyName;
 	std::string baseName;
+	int retVal = DEVICE_OK;
 	
 	if (slot == 0)
 	{
@@ -47,14 +48,17 @@ void PureFocus850AutoFocus::UpdateObjectiveSlotProperties(const long slot)
 
 		propertyName = baseName;
 		propertyName.append(propPreset);
-		UpdateProperty(propertyName.c_str());
+		if (retVal == DEVICE_OK)
+		{
+			retVal = UpdateProperty(propertyName.c_str());
+		}
 
-		for (j = 0; j < 5; j ++)
+		for (j = 0; (j < 5) && (retVal == DEVICE_OK); j ++)
 		{
 			propertyName = baseName;
 			propertyName.append(propLensOffset);
 			baseName.append(1, (char)('0' + j));
-			UpdateProperty(propertyName.c_str());
+			retVal = UpdateProperty(propertyName.c_str());
 		}
 	}
 
@@ -255,7 +259,8 @@ int PureFocus850AutoFocus::OnPreset(MM::PropertyBase* pProp, MM::ActionType eAct
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set("");
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -297,7 +302,7 @@ int PureFocus850AutoFocus::OnPreset(MM::PropertyBase* pProp, MM::ActionType eAct
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -339,7 +344,8 @@ int PureFocus850AutoFocus::OnPinholeCentre(MM::PropertyBase* pProp, MM::ActionTy
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -398,7 +404,7 @@ int PureFocus850AutoFocus::OnPinholeCentre(MM::PropertyBase* pProp, MM::ActionTy
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -467,7 +473,8 @@ int PureFocus850AutoFocus::OnPinholeWidth(MM::PropertyBase* pProp, MM::ActionTyp
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -526,7 +533,7 @@ int PureFocus850AutoFocus::OnPinholeWidth(MM::PropertyBase* pProp, MM::ActionTyp
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -595,7 +602,8 @@ int PureFocus850AutoFocus::OnLaserPower(MM::PropertyBase* pProp, MM::ActionType 
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -654,7 +662,7 @@ int PureFocus850AutoFocus::OnLaserPower(MM::PropertyBase* pProp, MM::ActionType 
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -716,7 +724,8 @@ int PureFocus850AutoFocus::OnBackgroundA(MM::PropertyBase* pProp, MM::ActionType
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -775,7 +784,7 @@ int PureFocus850AutoFocus::OnBackgroundA(MM::PropertyBase* pProp, MM::ActionType
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -840,7 +849,8 @@ int PureFocus850AutoFocus::OnBackgroundB(MM::PropertyBase* pProp, MM::ActionType
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -899,7 +909,7 @@ int PureFocus850AutoFocus::OnBackgroundB(MM::PropertyBase* pProp, MM::ActionType
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -964,7 +974,8 @@ int PureFocus850AutoFocus::OnBackgroundC(MM::PropertyBase* pProp, MM::ActionType
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -1023,7 +1034,7 @@ int PureFocus850AutoFocus::OnBackgroundC(MM::PropertyBase* pProp, MM::ActionType
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -1088,7 +1099,8 @@ int PureFocus850AutoFocus::OnBackgroundD(MM::PropertyBase* pProp, MM::ActionType
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -1147,7 +1159,7 @@ int PureFocus850AutoFocus::OnBackgroundD(MM::PropertyBase* pProp, MM::ActionType
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -1212,7 +1224,8 @@ int PureFocus850AutoFocus::OnKP(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -1271,7 +1284,7 @@ int PureFocus850AutoFocus::OnKP(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -1333,7 +1346,8 @@ int PureFocus850AutoFocus::OnKI(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -1392,7 +1406,7 @@ int PureFocus850AutoFocus::OnKI(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -1454,7 +1468,8 @@ int PureFocus850AutoFocus::OnKD(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -1513,7 +1528,7 @@ int PureFocus850AutoFocus::OnKD(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -1575,7 +1590,8 @@ int PureFocus850AutoFocus::OnOutputLimitMin(MM::PropertyBase* pProp, MM::ActionT
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -1634,7 +1650,7 @@ int PureFocus850AutoFocus::OnOutputLimitMin(MM::PropertyBase* pProp, MM::ActionT
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -1696,7 +1712,8 @@ int PureFocus850AutoFocus::OnOutputLimitMax(MM::PropertyBase* pProp, MM::ActionT
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -1755,7 +1772,7 @@ int PureFocus850AutoFocus::OnOutputLimitMax(MM::PropertyBase* pProp, MM::ActionT
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -1817,7 +1834,8 @@ int PureFocus850AutoFocus::OnSampleLowThreshold(MM::PropertyBase* pProp, MM::Act
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -1876,7 +1894,7 @@ int PureFocus850AutoFocus::OnSampleLowThreshold(MM::PropertyBase* pProp, MM::Act
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -1938,7 +1956,8 @@ int PureFocus850AutoFocus::OnFocusLowThreshold(MM::PropertyBase* pProp, MM::Acti
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -1997,7 +2016,7 @@ int PureFocus850AutoFocus::OnFocusLowThreshold(MM::PropertyBase* pProp, MM::Acti
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -2059,7 +2078,8 @@ int PureFocus850AutoFocus::OnFocusHighThreshold(MM::PropertyBase* pProp, MM::Act
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -2118,7 +2138,7 @@ int PureFocus850AutoFocus::OnFocusHighThreshold(MM::PropertyBase* pProp, MM::Act
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -2180,7 +2200,8 @@ int PureFocus850AutoFocus::OnFocusRangeThreshold(MM::PropertyBase* pProp, MM::Ac
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -2239,7 +2260,7 @@ int PureFocus850AutoFocus::OnFocusRangeThreshold(MM::PropertyBase* pProp, MM::Ac
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -2301,7 +2322,8 @@ int PureFocus850AutoFocus::OnInterfaceHighThreshold(MM::PropertyBase* pProp, MM:
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -2360,7 +2382,7 @@ int PureFocus850AutoFocus::OnInterfaceHighThreshold(MM::PropertyBase* pProp, MM:
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -2422,7 +2444,8 @@ int PureFocus850AutoFocus::OnInterfaceLowThreshold(MM::PropertyBase* pProp, MM::
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -2481,7 +2504,7 @@ int PureFocus850AutoFocus::OnInterfaceLowThreshold(MM::PropertyBase* pProp, MM::
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -2543,7 +2566,8 @@ int PureFocus850AutoFocus::OnServoLimitOn(MM::PropertyBase* pProp, MM::ActionTyp
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -2603,7 +2627,7 @@ int PureFocus850AutoFocus::OnServoLimitOn(MM::PropertyBase* pProp, MM::ActionTyp
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -2667,7 +2691,8 @@ int PureFocus850AutoFocus::OnServoLimitMaxPositive(MM::PropertyBase* pProp, MM::
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -2727,7 +2752,7 @@ int PureFocus850AutoFocus::OnServoLimitMaxPositive(MM::PropertyBase* pProp, MM::
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -2789,7 +2814,8 @@ int PureFocus850AutoFocus::OnServoLimitMaxNegative(MM::PropertyBase* pProp, MM::
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -2849,7 +2875,7 @@ int PureFocus850AutoFocus::OnServoLimitMaxNegative(MM::PropertyBase* pProp, MM::
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -2913,7 +2939,8 @@ int PureFocus850AutoFocus::OnLensOffset(MM::PropertyBase* pProp, MM::ActionType 
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -2963,7 +2990,7 @@ int PureFocus850AutoFocus::OnLensOffset(MM::PropertyBase* pProp, MM::ActionType 
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -3024,7 +3051,8 @@ int PureFocus850AutoFocus::OnRegionStartD(MM::PropertyBase* pProp, MM::ActionTyp
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -3083,7 +3111,7 @@ int PureFocus850AutoFocus::OnRegionStartD(MM::PropertyBase* pProp, MM::ActionTyp
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)
@@ -3145,7 +3173,8 @@ int PureFocus850AutoFocus::OnRegionEndD(MM::PropertyBase* pProp, MM::ActionType 
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -3204,7 +3233,7 @@ int PureFocus850AutoFocus::OnRegionEndD(MM::PropertyBase* pProp, MM::ActionType 
 			if (ret == DEVICE_OK)
 			{
 				// Need to know which objective setting is currently active
-				ret = UpdateProperty("Objective");
+				ret = UpdateProperty(propObjective);
 				if (ret == DEVICE_OK)
 				{
 					if (slot != objectiveSelect)

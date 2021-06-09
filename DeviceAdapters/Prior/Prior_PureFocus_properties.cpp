@@ -58,7 +58,8 @@ int PureFocus850AutoFocus::OnSerialNumber(MM::PropertyBase* pProp, MM::ActionTyp
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -80,7 +81,8 @@ int PureFocus850AutoFocus::OnBuildVersion(MM::PropertyBase* pProp, MM::ActionTyp
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set("");
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -102,7 +104,8 @@ int PureFocus850AutoFocus::OnBuildDateTime(MM::PropertyBase* pProp, MM::ActionTy
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set("");
 	}
 	else if (eAct == MM::BeforeGet)
 	{

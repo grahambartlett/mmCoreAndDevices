@@ -35,7 +35,8 @@ int PureFocus850AutoFocus::OnIsPiezoMotor(MM::PropertyBase* pProp, MM::ActionTyp
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -156,7 +157,8 @@ int PureFocus850AutoFocus::OnServoOn(MM::PropertyBase* pProp, MM::ActionType eAc
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -225,7 +227,8 @@ int PureFocus850AutoFocus::OnServoInhibit(MM::PropertyBase* pProp, MM::ActionTyp
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -294,7 +297,8 @@ int PureFocus850AutoFocus::OnFocusInterruptOn(MM::PropertyBase* pProp, MM::Actio
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -363,7 +367,8 @@ int PureFocus850AutoFocus::OnInterfaceInhibit(MM::PropertyBase* pProp, MM::Actio
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -433,7 +438,8 @@ int PureFocus850AutoFocus::OnInterfaceInhibitCount(MM::PropertyBase* pProp, MM::
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -497,7 +503,8 @@ int PureFocus850AutoFocus::OnDigipotControlsOffset(MM::PropertyBase* pProp, MM::
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -566,7 +573,8 @@ int PureFocus850AutoFocus::OnIsServoDirectionPositive(MM::PropertyBase* pProp, M
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -635,7 +643,8 @@ int PureFocus850AutoFocus::OnIsFocusDriveDirectionPositive(MM::PropertyBase* pPr
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0L);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -704,7 +713,8 @@ int PureFocus850AutoFocus::OnExposureTimeUs(MM::PropertyBase* pProp, MM::ActionT
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -767,7 +777,8 @@ int PureFocus850AutoFocus::OnDigipotOffsetSpeedPercent(MM::PropertyBase* pProp, 
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -830,7 +841,8 @@ int PureFocus850AutoFocus::OnFocusDriveRangeMicrons(MM::PropertyBase* pProp, MM:
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -893,7 +905,8 @@ int PureFocus850AutoFocus::OnInFocusRecoveryTimeMs(MM::PropertyBase* pProp, MM::
 
 	if (!initialized)
 	{
-		// Ignore request
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
 	}
 	else if (eAct == MM::BeforeGet)
 	{
