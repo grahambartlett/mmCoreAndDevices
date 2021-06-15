@@ -62,97 +62,168 @@ int PureFocus850AutoFocus::UpdateObjectiveSlotProperties(const long slot)
 		}
 	}
 
-	propertyName = baseName;
-	propertyName.append(propKP);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propKP);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propKI);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propKI);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propKD);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propKD);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propOutputLimitMinimum);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propOutputLimitMinimum);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propOutputLimitMaximum);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propOutputLimitMaximum);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propSampleLowThreshold);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propSampleLowThreshold);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propFocusLowThreshold);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propFocusLowThreshold);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propFocusHighThreshold);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propFocusHighThreshold);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propFocusRangeThreshold);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propFocusRangeThreshold);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propInterfaceHighThreshold);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propInterfaceHighThreshold);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propInterfaceLowThreshold);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propInterfaceLowThreshold);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propLaserPower);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propLaserPower);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propBackgroundA);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propBackgroundA);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propBackgroundB);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propBackgroundB);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propBackgroundC);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propBackgroundC);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propBackgroundD);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propBackgroundD);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propRegionStartD);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propRegionStartD);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propRegionEndD);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propRegionEndD);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propPinholeCentre);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propPinholeCentre);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propPinholeWidth);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propPinholeWidth);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propIsServoLimitOn);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propIsServoLimitOn);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propServoLimitMaxPositiveMicrons);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propServoLimitMaxPositiveMicrons);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
 
-	propertyName = baseName;
-	propertyName.append(propServoLimitMaxNegativeMicrons);
-	UpdateProperty(propertyName.c_str());
+	if (retVal == DEVICE_OK)
+	{
+		propertyName = baseName;
+		propertyName.append(propServoLimitMaxNegativeMicrons);
+		retVal = UpdateProperty(propertyName.c_str());
+	}
+
+	return retVal;
 }
 
 

@@ -543,7 +543,7 @@ singleChangeInProgress(false)
 
 	// Status values read back from unit
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnCalculationABCD);
-	CreateProperty(propCalculationABCD, "0,0,0,0", MM::String, true, action);
+	CreateProperty(propCalculationABCD, "0:0:0:0", MM::String, true, action);
 
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnFocusPidTarget);
 	CreateProperty(propFocusPidTarget, "0", MM::Float, true, action);

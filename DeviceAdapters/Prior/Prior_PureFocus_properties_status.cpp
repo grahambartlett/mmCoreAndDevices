@@ -33,7 +33,7 @@ int PureFocus850AutoFocus::OnCalculationABCD(MM::PropertyBase* pProp, MM::Action
 	if (!initialized)
 	{
 		// Ignore request and set dummy default
-		pProp->Set("0,0,0,0");
+		pProp->Set("0:0:0:0");
 	}
 	else if (eAct == MM::BeforeGet)
 	{
@@ -42,7 +42,7 @@ int PureFocus850AutoFocus::OnCalculationABCD(MM::PropertyBase* pProp, MM::Action
 		if (ret == DEVICE_OK)
 		{
 			std::ostringstream stringValue;
-			stringValue << a << "," << b << "," << c << "," << d;
+			stringValue << a << ":" << b << ":" << c << ":" << d;
 			pProp->Set(stringValue.str().c_str());
 		}
 	}

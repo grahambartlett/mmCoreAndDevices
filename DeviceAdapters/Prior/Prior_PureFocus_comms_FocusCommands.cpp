@@ -244,7 +244,7 @@ int PureFocus850AutoFocus::GetFocusPositionUm(double& value)
 	{
 		// Send command
 		std::ostringstream command;
-		command << "LENSP";
+		command << "PZ";
 
 		ret = SendSerialCommand(port.c_str(), command.str().c_str(), "\r");
 
