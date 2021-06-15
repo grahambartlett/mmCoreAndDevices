@@ -356,10 +356,13 @@ int PureFocus850AutoFocus::OnPreset(MM::PropertyBase* pProp, MM::ActionType eAct
 		else if (configInProgress)
 		{
 			// Load property state from configuration on startup
+			// Do not use setPreset() here, because we must not
+			// change other settings on startup.  Any differences
+			// will be reconciled when configInProgress is cleared
+			// and the mass update is started.
 			std::string value;
 			pProp->Get(value);
-			objective[slot - 1].setPreset(value);
-			UpdateObjectiveSlotProperties(slot);
+			objective[slot - 1].preset = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -450,18 +453,10 @@ int PureFocus850AutoFocus::OnPinholeCentre(MM::PropertyBase* pProp, MM::ActionTy
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].pinholeCentre);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].pinholeCentre = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].pinholeCentre = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -579,18 +574,10 @@ int PureFocus850AutoFocus::OnPinholeWidth(MM::PropertyBase* pProp, MM::ActionTyp
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].pinholeWidth);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].pinholeWidth = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].pinholeWidth = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -708,18 +695,10 @@ int PureFocus850AutoFocus::OnLaserPower(MM::PropertyBase* pProp, MM::ActionType 
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].laserPower);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].laserPower = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].laserPower = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -830,18 +809,10 @@ int PureFocus850AutoFocus::OnBackgroundA(MM::PropertyBase* pProp, MM::ActionType
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].backgroundA);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].backgroundA = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].backgroundA = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -955,18 +926,10 @@ int PureFocus850AutoFocus::OnBackgroundB(MM::PropertyBase* pProp, MM::ActionType
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].backgroundB);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].backgroundB = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].backgroundB = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -1080,18 +1043,10 @@ int PureFocus850AutoFocus::OnBackgroundC(MM::PropertyBase* pProp, MM::ActionType
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].backgroundC);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].backgroundC = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].backgroundC = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -1205,18 +1160,10 @@ int PureFocus850AutoFocus::OnBackgroundD(MM::PropertyBase* pProp, MM::ActionType
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].backgroundD);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].backgroundD = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].backgroundD = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -1330,18 +1277,10 @@ int PureFocus850AutoFocus::OnKP(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].kP);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].kP = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].kP = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -1452,18 +1391,10 @@ int PureFocus850AutoFocus::OnKI(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].kI);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].kI = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].kI = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -1574,18 +1505,10 @@ int PureFocus850AutoFocus::OnKD(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].kD);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].kD = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].kD = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -1696,18 +1619,10 @@ int PureFocus850AutoFocus::OnOutputLimitMin(MM::PropertyBase* pProp, MM::ActionT
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].outputLimitMin);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].outputLimitMin = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].outputLimitMin = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -1818,18 +1733,10 @@ int PureFocus850AutoFocus::OnOutputLimitMax(MM::PropertyBase* pProp, MM::ActionT
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].outputLimitMax);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].outputLimitMax = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].outputLimitMax = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -1940,18 +1847,10 @@ int PureFocus850AutoFocus::OnSampleLowThreshold(MM::PropertyBase* pProp, MM::Act
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].sampleLowThreshold);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].sampleLowThreshold = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].sampleLowThreshold = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -2062,18 +1961,10 @@ int PureFocus850AutoFocus::OnFocusLowThreshold(MM::PropertyBase* pProp, MM::Acti
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].focusLowThreshold);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].focusLowThreshold = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].focusLowThreshold = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -2184,18 +2075,10 @@ int PureFocus850AutoFocus::OnFocusHighThreshold(MM::PropertyBase* pProp, MM::Act
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].focusHighThreshold);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].focusHighThreshold = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].focusHighThreshold = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -2306,18 +2189,10 @@ int PureFocus850AutoFocus::OnFocusRangeThreshold(MM::PropertyBase* pProp, MM::Ac
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].focusRangeThreshold);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].focusRangeThreshold = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].focusRangeThreshold = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -2428,18 +2303,10 @@ int PureFocus850AutoFocus::OnInterfaceHighThreshold(MM::PropertyBase* pProp, MM:
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].interfaceHighThreshold);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].interfaceHighThreshold = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].interfaceHighThreshold = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -2550,18 +2417,10 @@ int PureFocus850AutoFocus::OnInterfaceLowThreshold(MM::PropertyBase* pProp, MM::
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].interfaceLowThreshold);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].interfaceLowThreshold = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].interfaceLowThreshold = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -2673,18 +2532,10 @@ int PureFocus850AutoFocus::OnServoLimitOn(MM::PropertyBase* pProp, MM::ActionTyp
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set((long)objective[slot-1].servoLimitOn);
-			}
-			else
-			{
-				// Load property state from configuration
-				long value;
-				pProp->Get(value);
-				objective[slot - 1].servoLimitOn = (value != 0);
-			}
+			// Load property state from configuration
+			long value;
+			pProp->Get(value);
+			objective[slot - 1].servoLimitOn = (value != 0);
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -2798,18 +2649,10 @@ int PureFocus850AutoFocus::OnServoLimitMaxPositive(MM::PropertyBase* pProp, MM::
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].servoLimitMaxPositiveMicrons);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].servoLimitMaxPositiveMicrons = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].servoLimitMaxPositiveMicrons = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -2921,18 +2764,10 @@ int PureFocus850AutoFocus::OnServoLimitMaxNegative(MM::PropertyBase* pProp, MM::
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].servoLimitMaxNegativeMicrons);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].servoLimitMaxNegativeMicrons = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].servoLimitMaxNegativeMicrons = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -3036,18 +2871,10 @@ int PureFocus850AutoFocus::OnLensOffset(MM::PropertyBase* pProp, MM::ActionType 
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].lensOffsets[lens]);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].lensOffsets[lens] = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].lensOffsets[lens] = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -3157,18 +2984,10 @@ int PureFocus850AutoFocus::OnRegionStartD(MM::PropertyBase* pProp, MM::ActionTyp
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].regionStartD);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].regionStartD = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].regionStartD = value;
 		}
 		else if (!singleChangeInProgress)
 		{
@@ -3279,18 +3098,10 @@ int PureFocus850AutoFocus::OnRegionEndD(MM::PropertyBase* pProp, MM::ActionType 
 		}
 		else if (configInProgress)
 		{
-			if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-			{
-				// Preserve value from preset
-				pProp->Set(objective[slot-1].regionEndD);
-			}
-			else
-			{
-				// Load property state from configuration
-				double value;
-				pProp->Get(value);
-				objective[slot - 1].regionEndD = value;
-			}
+			// Load property state from configuration
+			double value;
+			pProp->Get(value);
+			objective[slot - 1].regionEndD = value;
 		}
 		else if (!singleChangeInProgress)
 		{

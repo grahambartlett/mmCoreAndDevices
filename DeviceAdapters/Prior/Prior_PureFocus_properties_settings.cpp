@@ -52,6 +52,17 @@ int PureFocus850AutoFocus::OnConfigInProgress(MM::PropertyBase* pProp, MM::Actio
 			long objectiveSelected = 1;
 			long slot;
 
+			// We have no guarantee of the order in which the preset name and individual values
+			// are updated.  We must set the preset names here to guarantee that values for
+			// presets are picked up correctly.  The custom preset name will leave individual
+			// values unchanged.
+			for (slot = 1; slot <= 6; slot++)
+			{
+				std::string objectiveName = objective[slot - 1].preset;
+				objective[slot - 1].setPreset(objectiveName);
+				UpdateObjectiveSlotProperties(slot);
+			};
+
 			// After this, properties can only be changed for current objective
 			configInProgress = false;
 			
@@ -89,7 +100,10 @@ int PureFocus850AutoFocus::OnConfigInProgress(MM::PropertyBase* pProp, MM::Actio
 					ret = SetObjective(slot);
 				}
 
-				ret = SendObjectiveSlotProperties(slot);
+				if (ret == DEVICE_OK)
+				{
+					ret = SendObjectiveSlotProperties(slot);
+				}
 			}
 
 			// Configure global settings
