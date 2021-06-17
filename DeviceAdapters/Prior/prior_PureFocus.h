@@ -77,13 +77,19 @@ public:
 	@param index Index for name
 	@returns True if we have a name with this index, false if not
 	*/
-	bool getValidPresetName(std::string& presetName, unsigned long index);
+	static bool getValidPresetName(std::string& presetName, unsigned long index);
 
 	/** Default preset name */
 	static const char *const defaultPresetName;
 
 	/** Custom preset name */
 	static const char *const customPresetName;
+
+	/** Stepper type prefix */
+	static const char *const stepperPrefix;
+
+	/** Piezo type prefix */
+	static const char *const piezoPrefix;
 };
 
 
@@ -177,10 +183,12 @@ public:
 	int OnPositiveLimitSwitch(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnNegativeLimitSwitch(MM::PropertyBase* pProp, MM::ActionType eAct);
 
-	// Actions for unit build properties
+	// Actions for other properties
 	int OnSerialNumber(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnBuildVersion(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnBuildDateTime(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnArrayReadIndex(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnObjectivePresetNames(MM::PropertyBase* pProp, MM::ActionType eAct);
 	
 	// Comms with PF850
 	int SetKeypadLock(const bool value);
@@ -318,6 +326,9 @@ private:
 	double offsetPositionUm;
 	double focusPositionUm;
 
+	/* Index for reading back array data */
+	long arrayReadIndex;
+
 	/* Lock out default copy operations */
 	PureFocus850AutoFocus(PureFocus850AutoFocus&);
 	PureFocus850AutoFocus& operator=(PureFocus850AutoFocus&);
@@ -399,6 +410,13 @@ private:
 	static char* propIsFocusDriveMoving;
 	static char* propPositiveLimitSwitch;
 	static char* propNegativeLimitSwitch;
+
+	/* Other general properties */
+	static char* propSerialNumber;
+	static char* propFirmwareBuildVersion;
+	static char* propFirmwareBuildDateTime;
+	static char* propArrayReadIndex;
+	static char* propObjectivePresetNames;
 };
 
 

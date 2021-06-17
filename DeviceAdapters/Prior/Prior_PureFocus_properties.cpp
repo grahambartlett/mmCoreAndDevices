@@ -119,3 +119,51 @@ int PureFocus850AutoFocus::OnBuildDateTime(MM::PropertyBase* pProp, MM::ActionTy
 
 	return ret;
 }
+
+
+int PureFocus850AutoFocus::OnArrayReadIndex(MM::PropertyBase* pProp, MM::ActionType eAct)
+{
+	int ret = DEVICE_OK;
+
+	if (eAct == MM::BeforeGet)
+	{
+		pProp->Set(arrayReadIndex);
+	}
+	else if (eAct == MM::AfterSet)
+	{
+		long value;
+		pProp->Get(value);
+		arrayReadIndex = value;
+	}
+	else
+	{
+		// Ignore
+	}
+
+	return ret;
+}
+
+
+int PureFocus850AutoFocus::OnObjectivePresetNames(MM::PropertyBase* pProp, MM::ActionType eAct)
+{
+	int ret = DEVICE_OK;
+
+	if (eAct == MM::BeforeGet)
+	{
+		// Get name at index
+		std::string presetName;
+		bool isOk = PureFocus850ObjectiveSlot::getValidPresetName(presetName, arrayReadIndex);
+
+		if (isOk)
+		{
+			pProp->Set(presetName.c_str());
+		}
+		else
+		{
+			// Out of range
+			ret = ERR_INVALID_VALUE;
+		}
+	}
+
+	return ret;
+}

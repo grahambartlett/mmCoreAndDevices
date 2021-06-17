@@ -97,6 +97,13 @@ char* PureFocus850AutoFocus::propIsFocusDriveMoving = "Status-IsFocusDriveMoving
 char* PureFocus850AutoFocus::propPositiveLimitSwitch = "Status-PositiveLimitSwitch";
 char* PureFocus850AutoFocus::propNegativeLimitSwitch = "Status-NegativeLimitSwitch";
 
+/* Other general properties */
+char* PureFocus850AutoFocus::propSerialNumber = "SerialNumber";
+char* PureFocus850AutoFocus::propFirmwareBuildVersion = "FirmwareBuildVersion";
+char* PureFocus850AutoFocus::propFirmwareBuildDateTime = "FirmwareBuildDateTime";
+char* PureFocus850AutoFocus::propArrayReadIndex = "ArrayReadIndex";
+char* PureFocus850AutoFocus::propObjectivePresetNames = "ObjectivePresetNames";
+
 
 PureFocus850AutoFocus::PureFocus850AutoFocus() :
 
@@ -128,8 +135,8 @@ focusPositionUm(0.0),
 
 // Config/setting updates
 configInProgress(false),
-singleChangeInProgress(false)
-
+singleChangeInProgress(false),
+arrayReadIndex(0)
 {
 	CPropertyAction* action;
 	CPropertyActionEx* actionEx;
@@ -148,15 +155,21 @@ singleChangeInProgress(false)
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnPort);
 	CreateProperty(MM::g_Keyword_Port, "Undefined", MM::String, false, action, true);
 
-	// Device details
+	// Device details and other propertires
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnSerialNumber);
-	CreateProperty("SerialNumber", "0", MM::String, true, action);
+	CreateProperty(propSerialNumber, "0", MM::String, true, action);
 
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnBuildVersion);
-	CreateProperty("FirmwareBuildVersion", "Undefined", MM::String, true, action);
+	CreateProperty(propFirmwareBuildVersion, "", MM::String, true, action);
 
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnBuildDateTime);
-	CreateProperty("FirmwareBuildDateTime", "Undefined", MM::String, true, action);
+	CreateProperty(propFirmwareBuildDateTime, "", MM::String, true, action);
+
+	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnArrayReadIndex);
+	CreateProperty(propArrayReadIndex, "0", MM::Integer, false, action);
+
+	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnObjectivePresetNames);
+	CreateProperty(propObjectivePresetNames, "", MM::String, true, action);
 
 	// Objective settings, stored in configuration
 	for (int i = 1; i <= 6; i++)
