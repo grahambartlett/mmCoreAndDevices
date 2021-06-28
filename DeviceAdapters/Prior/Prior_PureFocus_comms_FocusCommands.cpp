@@ -215,7 +215,16 @@ int PureFocus850AutoFocus::SetFocusPositionUm(const double value)
 				else if ((answer.length() > 2) && (answer[0] == 'E'))
 				{
 					int errNo = atoi(answer.substr(2).c_str());
-					ret = ERR_OFFSET + errNo;
+					if (errNo == 2)
+					{
+						// If the stage is moving, this command fails with a "not idle"
+						// response.  Per RobW, this is expected and the GUI should ignore it.
+					}
+					else
+					{
+						// We still want to report other errors
+						ret = ERR_OFFSET + errNo;
+					}
 				}
 				else
 				{
