@@ -168,6 +168,9 @@ public:
 	int OnObjectiveSelect(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnOffsetPositionUm(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnFocusPositionUm(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnLiftToLoadDistanceUm(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnFocusPositionStepUm(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnOffsetPositionStepUm(MM::PropertyBase* pProp, MM::ActionType eAct);
 
 	// Actions for read-only status properties
 	int OnCalculationABCD(MM::PropertyBase* pProp, MM::ActionType eAct);
@@ -182,6 +185,9 @@ public:
 	int OnIsFocusDriveMoving(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnPositiveLimitSwitch(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnNegativeLimitSwitch(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnServoInLimit(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnIsSamplePresent(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnIsInterfaceCorrect(MM::PropertyBase* pProp, MM::ActionType eAct);
 
 	// Actions for other properties
 	int OnSerialNumber(MM::PropertyBase* pProp, MM::ActionType eAct);
@@ -189,6 +195,9 @@ public:
 	int OnBuildDateTime(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnArrayReadIndex(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnObjectivePresetNames(MM::PropertyBase* pProp, MM::ActionType eAct);
+
+	// Action for one-shot commands
+	int OnExecuteCommand(MM::PropertyBase* pProp, MM::ActionType eAct);
 	
 	// Comms with PF850
 	int SetKeypadLock(const bool value);
@@ -286,6 +295,10 @@ public:
 	int GetInterfaceInhibit(bool& inhibit, double& count);
 	int SetExposureTimeUs(const double value);
 	int GetExposureTimeUs(double& value);
+	int GetServoInLimit(bool &value);
+	int SetZPositionAbsoluteUm(const double value);
+	int SetFocusPositionUpUm(const double value);
+	int SetFocusPositionDownUm(const double value);
 
 private:
 	bool initialized;
@@ -325,6 +338,9 @@ private:
 	long objectiveSelect;
 	double offsetPositionUm;
 	double focusPositionUm;
+	double liftToLoadDistanceUm;
+	double focusPositionStepUm;
+	double offsetPositionStepUm;
 
 	/* Index for reading back array data */
 	long arrayReadIndex;
@@ -397,6 +413,9 @@ private:
 	static char* propObjective;
 	static char* propOffsetPositionMicrons;
 	static char* propFocusPositionMicrons;
+	static char* propLiftToLoadDistanceMicrons;
+	static char* propFocusPositionStepMicrons;
+	static char* propOffsetPositionStepMicrons;
 
 	/* Names of status values read back */
 	static char* propCalculationABCD;
@@ -410,6 +429,9 @@ private:
 	static char* propIsFocusDriveMoving;
 	static char* propPositiveLimitSwitch;
 	static char* propNegativeLimitSwitch;
+	static char* propServoInLimit;
+	static char* propIsSamplePresent;
+	static char* propIsInterfaceCorrect;
 
 	/* Other general properties */
 	static char* propSerialNumber;
@@ -417,6 +439,41 @@ private:
 	static char* propFirmwareBuildDateTime;
 	static char* propArrayReadIndex;
 	static char* propObjectivePresetNames;
+	static char* propExecuteCommand;
+
+	/** State enumerations for executing command.
+
+	MicroManager does not have the concept of making function calls down the stack,
+	so it is necessary to use a "command" property which triggers actions based on
+	values passed.
+
+	To ensure entering random values cannot easily trigger commands, each command
+	value contains an inverted copy of the same "key" value.  We can then easily
+	validate the value without needing further checks.  This is only a simple
+	interlock to protect against accidental changes, not a security measure.
+
+	So that this fits in signed or unsigned long integers without producing
+	warnings, we will stick to 12-bit "key" values, giving 24-bit enumerated values
+	with the inverted copy of the "key" value.  This allows for up to 4095 commands
+	which should be more than enough.
+	*/
+	enum ExecuteCommandState
+	{
+		NONE = 0,
+
+		SAVE_TO_UNIT			= 0x001FFE,
+
+		OFFSET_STEP_UP			= 0x010FEF,
+		OFFSET_STEP_DOWN		= 0x011FED,
+
+		Z_STEP_UP				= 0x020FDF,
+		Z_STEP_DOWN				= 0x021FDE,
+		Z_EMERGENCY_STOP		= 0x022FDD,
+		Z_SOFT_STOP				= 0x023FDC,
+		Z_GO_HOME				= 0x025FDA,
+		Z_LIFT_TO_LOAD			= 0x026FD9
+	};
+
 };
 
 

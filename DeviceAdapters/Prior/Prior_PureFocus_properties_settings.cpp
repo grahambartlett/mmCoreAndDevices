@@ -248,26 +248,34 @@ int PureFocus850AutoFocus::OnObjectiveSelect(MM::PropertyBase* pProp, MM::Action
 	}
 	else if (eAct == MM::AfterSet)
 	{
-		long value;
-		pProp->Get(value);
-
-		if ((value < 1) || (value > 6))
+		if (configInProgress || (!singleChangeInProgress))
 		{
-			ret = ERR_INVALID_VALUE;
+			// Revert displayed value during starting or not enabled
+			pProp->Set(objectiveSelect);
 		}
 		else
 		{
-			ret = SetObjective(value);
-			if (ret == DEVICE_OK)
-			{
-				objectiveSelect = value;
-			}
-		}
+			long value;
+			pProp->Get(value);
 
-		if (ret != DEVICE_OK)
-		{
-			// Restore
-			pProp->Set(objectiveSelect);
+			if ((value < 1) || (value > 6))
+			{
+				ret = ERR_INVALID_VALUE;
+			}
+			else
+			{
+				ret = SetObjective(value);
+				if (ret == DEVICE_OK)
+				{
+					objectiveSelect = value;
+				}
+			}
+
+			if (ret != DEVICE_OK)
+			{
+				// Restore
+				pProp->Set(objectiveSelect);
+			}
 		}
 	}
 	else
@@ -298,19 +306,27 @@ int PureFocus850AutoFocus::OnOffsetPositionUm(MM::PropertyBase* pProp, MM::Actio
 	}
 	else if (eAct == MM::AfterSet)
 	{
-		double value;
-		pProp->Get(value);
-
-		ret = SetOffsetPositionUm(value);
-		if (ret == DEVICE_OK)
+		if (configInProgress || (!singleChangeInProgress))
 		{
-			offsetPositionUm = value;
+			// Revert displayed value during starting or not enabled
+			pProp->Set(objectiveSelect);
 		}
-
-		if (ret != DEVICE_OK)
+		else
 		{
-			// Restore
-			pProp->Set(offsetPositionUm);
+			double value;
+			pProp->Get(value);
+
+			ret = SetOffsetPositionUm(value);
+			if (ret == DEVICE_OK)
+			{
+				offsetPositionUm = value;
+			}
+
+			if (ret != DEVICE_OK)
+			{
+				// Restore
+				pProp->Set(offsetPositionUm);
+			}
 		}
 	}
 	else
@@ -341,19 +357,131 @@ int PureFocus850AutoFocus::OnFocusPositionUm(MM::PropertyBase* pProp, MM::Action
 	}
 	else if (eAct == MM::AfterSet)
 	{
-		double value;
-		pProp->Get(value);
-
-		ret = SetFocusPositionUm(value);
-		if (ret == DEVICE_OK)
+		if (configInProgress || (!singleChangeInProgress))
 		{
-			focusPositionUm = value;
+			// Revert displayed value during starting or not enabled
+			pProp->Set(objectiveSelect);
 		}
-
-		if (ret != DEVICE_OK)
+		else
 		{
-			// Restore
-			pProp->Set(focusPositionUm);
+			
+			double value;
+			pProp->Get(value);
+
+			ret = SetFocusPositionUm(value);
+			if (ret == DEVICE_OK)
+			{
+				focusPositionUm = value;
+			}
+
+			if (ret != DEVICE_OK)
+			{
+				// Restore
+				pProp->Set(focusPositionUm);
+			}
+		}
+	}
+	else
+	{
+		// No action
+	}
+
+	return ret;
+}
+
+
+
+int PureFocus850AutoFocus::OnLiftToLoadDistanceUm(MM::PropertyBase* pProp, MM::ActionType eAct)
+{
+	int ret = DEVICE_OK;
+
+	if (!initialized)
+	{
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		pProp->Set(liftToLoadDistanceUm);
+	}
+	else if (eAct == MM::AfterSet)
+	{
+		if ((!configInProgress) && (!singleChangeInProgress))
+		{
+			// Block this if not allowed
+			pProp->Set(liftToLoadDistanceUm);
+		}
+		else
+		{
+			pProp->Get(liftToLoadDistanceUm);
+		}
+	}
+	else
+	{
+		// No action
+	}
+
+	return ret;
+}
+
+
+int PureFocus850AutoFocus::OnFocusPositionStepUm(MM::PropertyBase* pProp, MM::ActionType eAct)
+{
+	int ret = DEVICE_OK;
+
+	if (!initialized)
+	{
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		pProp->Set(focusPositionStepUm);
+	}
+	else if (eAct == MM::AfterSet)
+	{
+		if ((!configInProgress) && (!singleChangeInProgress))
+		{
+			// Block this if not allowed
+			pProp->Set(focusPositionStepUm);
+		}
+		else
+		{
+			pProp->Get(focusPositionStepUm);
+		}
+	}
+	else
+	{
+		// No action
+	}
+
+	return ret;
+}
+
+
+int PureFocus850AutoFocus::OnOffsetPositionStepUm(MM::PropertyBase* pProp, MM::ActionType eAct)
+{
+	int ret = DEVICE_OK;
+
+	if (!initialized)
+	{
+		// Ignore request and set dummy default
+		pProp->Set(0.0);
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		pProp->Set(offsetPositionStepUm);
+	}
+	else if (eAct == MM::AfterSet)
+	{
+		if ((!configInProgress) && (!singleChangeInProgress))
+		{
+			// Block this if not allowed
+			pProp->Set(offsetPositionStepUm);
+		}
+		else
+		{
+			pProp->Get(offsetPositionStepUm);
 		}
 	}
 	else

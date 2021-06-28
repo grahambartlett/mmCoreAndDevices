@@ -302,3 +302,72 @@ int PureFocus850AutoFocus::OnNegativeLimitSwitch(MM::PropertyBase* pProp, MM::Ac
 
 	return ret;
 }
+
+
+int PureFocus850AutoFocus::OnServoInLimit(MM::PropertyBase* pProp, MM::ActionType eAct)
+{
+	int ret = DEVICE_OK;
+
+	if (!initialized)
+	{
+		// Ignore request and set dummy default
+		pProp->Set(0L);
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		bool value = false;
+		ret = GetServoInLimit(value);
+		if (ret == DEVICE_OK)
+		{
+			pProp->Set((long)value);
+		}
+	}
+
+	return ret;
+}
+
+
+int PureFocus850AutoFocus::OnIsSamplePresent(MM::PropertyBase* pProp, MM::ActionType eAct)
+{
+	int ret = DEVICE_OK;
+
+	if (!initialized)
+	{
+		// Ignore request and set dummy default
+		pProp->Set(0L);
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		bool value = false;
+		ret = GetSampleState(value);
+		if (ret == DEVICE_OK)
+		{
+			pProp->Set((long)value);
+		}
+	}
+
+	return ret;
+}
+
+
+int PureFocus850AutoFocus::OnIsInterfaceCorrect(MM::PropertyBase* pProp, MM::ActionType eAct)
+{
+	int ret = DEVICE_OK;
+
+	if (!initialized)
+	{
+		// Ignore request and set dummy default
+		pProp->Set(0L);
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		bool value = false;
+		ret = GetInterfaceCorrect(value);
+		if (ret == DEVICE_OK)
+		{
+			pProp->Set((long)value);
+		}
+	}
+
+	return ret;
+}

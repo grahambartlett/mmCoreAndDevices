@@ -738,3 +738,50 @@ int PureFocus850AutoFocus::GetOutputLimits(double& min, double& max)
 
 	return ret;
 }
+
+
+int PureFocus850AutoFocus::GetServoInLimit(bool &value)
+{
+	int ret = DEVICE_OK;
+
+	commsMutex.Lock();
+
+	// First clear serial port from previous stuff
+	ret = Prior::ClearPort(*this, *GetCoreCallback(), port);
+
+	if (ret == DEVICE_OK)
+	{
+		// Send command
+		std::ostringstream command;
+		command << "SERVOINLIMIT";
+
+		ret = SendSerialCommand(port.c_str(), command.str().c_str(), "\r");
+
+		if (ret == DEVICE_OK)
+		{
+			// Block/wait for acknowledge, or until we time out
+			std::string answer;
+			ret = GetSerialAnswer(port.c_str(), "\r", answer);
+
+			if (ret == DEVICE_OK)
+			{
+				// Parse response
+				if ((answer.length() > 2) && (answer[0] == 'E'))
+				{
+					int errNo = atoi(answer.substr(2).c_str());
+					ret = ERR_OFFSET + errNo;
+				}
+				else
+				{
+					// Check and tokenise response
+					int intVal = atoi(answer.c_str());
+					value = (intVal != 0);
+				}
+			}
+		}
+	}
+
+	commsMutex.Unlock();
+
+	return ret;
+}

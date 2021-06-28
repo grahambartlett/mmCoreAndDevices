@@ -131,9 +131,12 @@ int PureFocus850AutoFocus::OnArrayReadIndex(MM::PropertyBase* pProp, MM::ActionT
 	}
 	else if (eAct == MM::AfterSet)
 	{
-		long value;
-		pProp->Get(value);
-		arrayReadIndex = value;
+		if ((!configInProgress) && singleChangeInProgress)
+		{
+			long value;
+			pProp->Get(value);
+			arrayReadIndex = value;
+		}
 	}
 	else
 	{
@@ -163,6 +166,105 @@ int PureFocus850AutoFocus::OnObjectivePresetNames(MM::PropertyBase* pProp, MM::A
 			// Out of range
 			ret = ERR_INVALID_VALUE;
 		}
+	}
+
+	return ret;
+}
+
+
+int PureFocus850AutoFocus::OnExecuteCommand(MM::PropertyBase* pProp, MM::ActionType eAct)
+{
+	int ret = DEVICE_OK;
+
+	if (!initialized)
+	{
+		// Ignore request and set dummy default
+		pProp->Set((long)NONE);
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		pProp->Set((long)NONE);
+	}
+	else if (eAct == MM::AfterSet)
+	{
+		if ((!configInProgress) && singleChangeInProgress)
+		{
+			long value;
+			pProp->Get(value);
+
+			switch((ExecuteCommandState)value)
+			{
+			case SAVE_TO_UNIT:
+				ret = SaveConfigurationToFlash();
+				break;
+
+			case OFFSET_STEP_UP:
+				{
+					double position;
+					ret = PureFocus850AutoFocus::GetOffsetPositionUm(position);
+					if (ret == DEVICE_OK)
+					{
+						std::ostringstream positionValue;
+						positionValue << (position + offsetPositionStepUm);
+						ret = SetProperty(propOffsetPositionStepMicrons, positionValue.str().c_str());
+					}
+				}
+				break;
+
+			case OFFSET_STEP_DOWN:
+				{
+					double position;
+					ret = PureFocus850AutoFocus::GetOffsetPositionUm(position);
+					if (ret == DEVICE_OK)
+					{
+						std::ostringstream positionValue;
+						positionValue << (position - offsetPositionStepUm);
+						ret = SetProperty(propOffsetPositionStepMicrons, positionValue.str().c_str());
+					}
+				}
+				break;
+
+			case Z_STEP_UP:
+				ret = SetFocusPositionUpUm(focusPositionStepUm);
+				break;
+
+			case Z_STEP_DOWN:
+				ret = SetFocusPositionDownUm(focusPositionStepUm);
+				break;
+
+			case Z_EMERGENCY_STOP:
+				/** @todo */
+				break;
+
+			case Z_SOFT_STOP:
+				/** @todo */
+				break;
+
+			case Z_GO_HOME:
+				if (isPiezoMotor)
+				{
+					// For a piezo, home is half travel range
+					ret = SetZPositionAbsoluteUm(focusDriveRangeMicrons * 0.5);
+				}
+				else
+				{
+					// For a stepper motor, home is zero
+					ret = SetZPositionAbsoluteUm(0.0);
+				}
+				break;
+
+			case Z_LIFT_TO_LOAD:
+				ret = SetZPositionAbsoluteUm(liftToLoadDistanceUm);
+				break;
+
+			default:
+				// Silently ignore this
+				break;
+			}
+		}
+
+		// Return property to idle state
+		pProp->Set((long)NONE);
 	}
 
 	return ret;

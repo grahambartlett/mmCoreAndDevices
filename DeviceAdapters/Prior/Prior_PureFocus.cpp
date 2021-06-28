@@ -83,6 +83,9 @@ char* PureFocus850AutoFocus::propSingleChangeInProgress = "SingleChangeInProgres
 char* PureFocus850AutoFocus::propObjective = "Setting-Objective";
 char* PureFocus850AutoFocus::propOffsetPositionMicrons = "Setting-OffsetPositionMicrons";
 char* PureFocus850AutoFocus::propFocusPositionMicrons = "Setting-FocusPositionMicrons";
+char* PureFocus850AutoFocus::propLiftToLoadDistanceMicrons = "Setting-LiftToLoadDistanceMicrons";
+char* PureFocus850AutoFocus::propFocusPositionStepMicrons = "Setting-FocusPositionStepMicrons";
+char* PureFocus850AutoFocus::propOffsetPositionStepMicrons = "Setting-OffsetPositionStepMicrons";
 
 /* Names of status values read back */
 char* PureFocus850AutoFocus::propCalculationABCD = "Status-CalculationABCD";
@@ -96,6 +99,9 @@ char* PureFocus850AutoFocus::propIsOffsetMoving = "Status-IsOffsetMoving";
 char* PureFocus850AutoFocus::propIsFocusDriveMoving = "Status-IsFocusDriveMoving";
 char* PureFocus850AutoFocus::propPositiveLimitSwitch = "Status-PositiveLimitSwitch";
 char* PureFocus850AutoFocus::propNegativeLimitSwitch = "Status-NegativeLimitSwitch";
+char* PureFocus850AutoFocus::propServoInLimit = "Status-ServoInLimit";
+char* PureFocus850AutoFocus::propIsSamplePresent = "Status-IsSamplePresent";
+char* PureFocus850AutoFocus::propIsInterfaceCorrect = "Status-IsInterfaceCorrect";
 
 /* Other general properties */
 char* PureFocus850AutoFocus::propSerialNumber = "SerialNumber";
@@ -103,6 +109,7 @@ char* PureFocus850AutoFocus::propFirmwareBuildVersion = "FirmwareBuildVersion";
 char* PureFocus850AutoFocus::propFirmwareBuildDateTime = "FirmwareBuildDateTime";
 char* PureFocus850AutoFocus::propArrayReadIndex = "ArrayReadIndex";
 char* PureFocus850AutoFocus::propObjectivePresetNames = "ObjectivePresetNames";
+char* PureFocus850AutoFocus::propExecuteCommand = "ExecuteCommand";
 
 
 PureFocus850AutoFocus::PureFocus850AutoFocus() :
@@ -132,6 +139,9 @@ inFocusRecoveryTimeMs(0.0),
 objectiveSelect(1),
 offsetPositionUm(0.0),
 focusPositionUm(0.0),
+liftToLoadDistanceUm(100.0),
+focusPositionStepUm(1.0),
+offsetPositionStepUm(1.0),
 
 // Config/setting updates
 configInProgress(false),
@@ -554,6 +564,15 @@ arrayReadIndex(0)
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnFocusPositionUm);
 	CreateProperty(propFocusPositionMicrons, "1", MM::Float, false, action);
 
+	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnLiftToLoadDistanceUm);
+	CreateProperty(propLiftToLoadDistanceMicrons, "100", MM::Float, false, action);
+
+	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnFocusPositionStepUm);
+	CreateProperty(propFocusPositionStepMicrons, "1", MM::Float, false, action);
+
+	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnOffsetPositionStepUm);
+	CreateProperty(propOffsetPositionStepMicrons, "1", MM::Float, false, action);
+
 	// Status values read back from unit
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnCalculationABCD);
 	CreateProperty(propCalculationABCD, "0:0:0:0", MM::String, true, action);
@@ -587,6 +606,19 @@ arrayReadIndex(0)
 
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnNegativeLimitSwitch);
 	CreateProperty(propNegativeLimitSwitch, "0", MM::Integer, true, action);
+
+	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnServoInLimit);
+	CreateProperty(propServoInLimit, "0", MM::Integer, true, action);
+
+	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnIsSamplePresent);
+	CreateProperty(propIsSamplePresent, "0", MM::Integer, true, action);
+
+	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnIsInterfaceCorrect);
+	CreateProperty(propIsInterfaceCorrect, "0", MM::Integer, true, action);
+
+	// Execute one-shot commands
+	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnExecuteCommand);
+	CreateProperty(propExecuteCommand, "0", MM::Integer, false, action);
 }
 
 
@@ -718,53 +750,91 @@ PureFocus850AutoFocus::~PureFocus850AutoFocus()
 
 int PureFocus850AutoFocus::SetContinuousFocusing(bool state)
 {
-	return 0;
+	int ret = DEVICE_OK;
+
+	// This is the same as reading/writing the ServoOn property
+	ret = SetServoOn(state);
+	if (ret == DEVICE_OK)
+	{
+		ret = UpdateProperty(propServoOn);
+	}
+	
+	return ret;
 }
 
 
 int PureFocus850AutoFocus::GetContinuousFocusing(bool& state)
 {
-	return 0;
+	int ret = DEVICE_OK;
+
+	// This is the same as reading/writing the ServoOn property
+	ret = UpdateProperty(propServoOn);
+	if (ret == DEVICE_OK)
+	{
+		state = servoOn;
+	}
+	
+	return ret;
 }
 
 
 bool PureFocus850AutoFocus::IsContinuousFocusLocked()
 {
-	return false;
+	bool result = false;
+	int ret = DEVICE_OK;
+	long status;
+
+	// This is the same as reading/writing the FocusState property
+	ret = GetProperty(propFocusState, status);
+	if (ret == DEVICE_OK)
+	{
+		result = (status != 0);
+	}
+	
+	return result;
 }
 
 
 int PureFocus850AutoFocus::FullFocus()
 {
-	return 0;
+	// This runs one-shot focussing.  Stub this, since it is not relevant for us.
+	return DEVICE_OK;
 }
 
 
 int PureFocus850AutoFocus::IncrementalFocus()
 {
-	return 0;
+	// This runs one-shot focussing.  Stub this, since it is not relevant for us.
+	return DEVICE_OK;
 }
 
 
 int PureFocus850AutoFocus::GetLastFocusScore(double& score)
 {
-	return 0;
+	(void)score;
+	// Since this runs autofocus continuously, there is no concept of a "last" focus score.
+	return DEVICE_UNSUPPORTED_COMMAND;
 }
 
 
 int PureFocus850AutoFocus::GetCurrentFocusScore(double& score)
 {
-	return 0;
+	// This is the same as reading/writing the FocusPidError property
+	return GetProperty(propFocusPidError, score);
 }
 
 
 int PureFocus850AutoFocus::GetOffset(double& offset)
 {
-	return 0;
+	/// @todo Does this correspond directly to our offset, or something else?
+	offset = 0.0;
+	return DEVICE_OK;
 }
 
 
 int PureFocus850AutoFocus::SetOffset(double offset)
 {
-	return 0;
+	(void)offset;
+	/// @todo Does this correspond directly to our offset, or something else?
+	return DEVICE_OK;
 }
