@@ -371,3 +371,49 @@ int PureFocus850AutoFocus::OnIsInterfaceCorrect(MM::PropertyBase* pProp, MM::Act
 
 	return ret;
 }
+
+
+int PureFocus850AutoFocus::OnLineData(MM::PropertyBase* pProp, MM::ActionType eAct, long section)
+{
+	int ret = DEVICE_OK;
+
+	if (!initialized)
+	{
+		// Ignore request and set dummy default
+		pProp->Set("");
+	}
+	else if ((section < 1) || (section > 6))
+	{
+		// Should never happen
+		pProp->Set("");
+	}
+	else if (eAct == MM::BeforeGet)
+	{
+		if (section == 1)
+		{
+			// Read line when getting first group of data
+			ret = RefreshLineData();
+			if (ret == DEVICE_OK)
+			{
+				ret = GetLineData(lineData);
+			}
+		}
+
+		if (ret == DEVICE_OK)
+		{
+			if (lineData.length() < 4500)
+			{
+				// Should never happen, or only if the first line has not be read
+				ret = DEVICE_SERIAL_INVALID_RESPONSE;
+			}
+			else
+			{
+				std::string substring;
+				substring.assign(lineData, (section - 1) * 750, 750);
+				pProp->Set(substring.c_str());
+			}
+		}
+	}
+
+	return ret;
+}

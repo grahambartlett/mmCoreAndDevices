@@ -66,6 +66,9 @@
     <ClCompile Include="Prior_PureFocus_properties_global.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Prior_PureFocus_comms_AdvancedCommands.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="prior.h">

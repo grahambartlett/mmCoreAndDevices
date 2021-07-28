@@ -162,6 +162,7 @@
   <ItemGroup>
     <ClCompile Include="Prior.cpp" />
     <ClCompile Include="Prior_PureFocus.cpp" />
+    <ClCompile Include="Prior_PureFocus_comms_AdvancedCommands.cpp" />
     <ClCompile Include="Prior_PureFocus_comms_DigipotSettings.cpp" />
     <ClCompile Include="Prior_PureFocus_comms_FlagSettings.cpp" />
     <ClCompile Include="Prior_PureFocus_comms_FocusCommands.cpp" />

@@ -188,6 +188,7 @@ public:
 	int OnServoInLimit(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnIsSamplePresent(MM::PropertyBase* pProp, MM::ActionType eAct);
 	int OnIsInterfaceCorrect(MM::PropertyBase* pProp, MM::ActionType eAct);
+	int OnLineData(MM::PropertyBase* pProp, MM::ActionType eAct, long section);
 
 	// Actions for other properties
 	int OnSerialNumber(MM::PropertyBase* pProp, MM::ActionType eAct);
@@ -299,6 +300,8 @@ public:
 	int SetZPositionAbsoluteUm(const double value);
 	int SetFocusPositionUpUm(const double value);
 	int SetFocusPositionDownUm(const double value);
+	int GetLineData(std::string& values);
+	int RefreshLineData();
 
 private:
 	bool initialized;
@@ -342,8 +345,11 @@ private:
 	double focusPositionStepUm;
 	double offsetPositionStepUm;
 
-	/* Index for reading back array data */
+	/** Index for reading back array data */
 	long arrayReadIndex;
+
+	/** Last captured data for line pixels */
+	std::string lineData;
 
 	/* Lock out default copy operations */
 	PureFocus850AutoFocus(PureFocus850AutoFocus&);
@@ -432,6 +438,12 @@ private:
 	static char* propServoInLimit;
 	static char* propIsSamplePresent;
 	static char* propIsInterfaceCorrect;
+	static char* propLineData1;
+	static char* propLineData2;
+	static char* propLineData3;
+	static char* propLineData4;
+	static char* propLineData5;
+	static char* propLineData6;
 
 	/* Other general properties */
 	static char* propSerialNumber;

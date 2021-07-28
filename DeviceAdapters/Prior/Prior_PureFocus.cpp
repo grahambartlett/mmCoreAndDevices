@@ -102,6 +102,12 @@ char* PureFocus850AutoFocus::propNegativeLimitSwitch = "Status-NegativeLimitSwit
 char* PureFocus850AutoFocus::propServoInLimit = "Status-ServoInLimit";
 char* PureFocus850AutoFocus::propIsSamplePresent = "Status-IsSamplePresent";
 char* PureFocus850AutoFocus::propIsInterfaceCorrect = "Status-IsInterfaceCorrect";
+char* PureFocus850AutoFocus::propLineData1 = "Status-LineData1";
+char* PureFocus850AutoFocus::propLineData2 = "Status-LineData2";
+char* PureFocus850AutoFocus::propLineData3 = "Status-LineData3";
+char* PureFocus850AutoFocus::propLineData4 = "Status-LineData4";
+char* PureFocus850AutoFocus::propLineData5 = "Status-LineData5";
+char* PureFocus850AutoFocus::propLineData6 = "Status-LineData6";
 
 /* Other general properties */
 char* PureFocus850AutoFocus::propSerialNumber = "SerialNumber";
@@ -615,6 +621,27 @@ arrayReadIndex(0)
 
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnIsInterfaceCorrect);
 	CreateProperty(propIsInterfaceCorrect, "0", MM::Integer, true, action);
+
+	/* Line data has 1500 points.  At 3 hex chars per point, we can split this over
+	6 lines each of 750 chars.  Max string length in MM is 1024 chars.
+	*/
+	actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnLineData, 1);
+	CreateProperty(propLineData1, "", MM::String, true, actionEx);
+
+	actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnLineData, 2);
+	CreateProperty(propLineData2, "", MM::String, true, actionEx);
+
+	actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnLineData, 3);
+	CreateProperty(propLineData3, "", MM::String, true, actionEx);
+
+	actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnLineData, 4);
+	CreateProperty(propLineData4, "", MM::String, true, actionEx);
+
+	actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnLineData, 5);
+	CreateProperty(propLineData5, "", MM::String, true, actionEx);
+
+	actionEx = new CPropertyActionEx(this, &PureFocus850AutoFocus::OnLineData, 6);
+	CreateProperty(propLineData6, "", MM::String, true, actionEx);
 
 	// Execute one-shot commands
 	action = new CPropertyAction(this, &PureFocus850AutoFocus::OnExecuteCommand);
