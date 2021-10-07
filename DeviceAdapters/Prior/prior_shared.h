@@ -81,6 +81,11 @@ namespace Prior
 	// @returns DEVICE_OK if OK, other error value if port is inaccessible
 	// @note Ideally there should be a global utility function available for this, but sadly there isn't.
 	int ClearPort(MM::Device& device, MM::Core& core, std::string port);
+
+	// Given a nibble value (0-15), output the hex ASCII char value (0-9, A-F).
+	// @param value Nibble value
+	// @returns Hex character
+	char NibbleToHex(unsigned int value);
 };
 
 

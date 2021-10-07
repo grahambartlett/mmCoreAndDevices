@@ -398,26 +398,44 @@ int PureFocus850AutoFocus::SetRegionD(const double start, const double end)
 
 		if (ret == DEVICE_OK)
 		{
-			// Block/wait for acknowledge, or until we time out
-			std::string answer;
-			ret = GetSerialAnswer(port.c_str(), "\r", answer);
-
-			if (ret == DEVICE_OK)
+			if (hasHead)
 			{
-				// Parse response
-				if (answer.find("REGION,D,") != std::string::npos)
+				// Block/wait for acknowledge, or until we time out
+				std::string answer;
+				ret = GetSerialAnswer(port.c_str(), "\r", answer);
+
+				if (ret == DEVICE_OK)
 				{
-					// Success
+					// Parse response
+					if (answer.find("REGION,D,") != std::string::npos)
+					{
+						// Success
+					}
+					else if ((answer.length() > 2) && (answer[0] == 'E'))
+					{
+						int errNo = atoi(answer.substr(2).c_str());
+						ret = ERR_OFFSET + errNo;
+					}
+					else
+					{
+						ret = ERR_UNRECOGNIZED_ANSWER;
+					}
 				}
-				else if ((answer.length() > 2) && (answer[0] == 'E'))
+				else if (allowNoHead)
 				{
-					int errNo = atoi(answer.substr(2).c_str());
-					ret = ERR_OFFSET + errNo;
+					/* Deal with head not present */
+					hasHead = false;
 				}
 				else
-				{
-					ret = ERR_UNRECOGNIZED_ANSWER;
+				{			
+					/* Comms error and answer expected */
 				}
+			}
+
+			if (!hasHead)
+			{
+				/* Simulate valid response if head is not present during development */
+				ret = DEVICE_OK;
 			}
 		}
 	}
@@ -447,35 +465,55 @@ int PureFocus850AutoFocus::GetRegionD(double& start, double& end)
 
 		if (ret == DEVICE_OK)
 		{
-			// Block/wait for acknowledge, or until we time out
-			std::string answer;
-			ret = GetSerialAnswer(port.c_str(), "\r", answer);
-
-			if (ret == DEVICE_OK)
+			if (hasHead)
 			{
-				// Parse response
-				if ((answer.length() > 2) && (answer[0] == 'E'))
+				// Block/wait for acknowledge, or until we time out
+				std::string answer;
+				ret = GetSerialAnswer(port.c_str(), "\r", answer);
+
+				if (ret == DEVICE_OK)
 				{
-					int errNo = atoi(answer.substr(2).c_str());
-					ret = ERR_OFFSET + errNo;
+					// Parse response
+					if ((answer.length() > 2) && (answer[0] == 'E'))
+					{
+						int errNo = atoi(answer.substr(2).c_str());
+						ret = ERR_OFFSET + errNo;
+					}
+					else
+					{
+						// Check and tokenise response
+						size_t endA = 0;
+
+						endA = answer.find(',');
+						if ((endA == std::string::npos) || (endA == 0) || (endA >= (answer.length() - 1)))
+						{
+							ret = ERR_UNRECOGNIZED_ANSWER;
+						}
+
+						if (ret == DEVICE_OK)
+						{
+							start = atof(answer.substr(0, endA).c_str());
+							end = atof(answer.substr(endA + 1).c_str());
+						}
+					}
+				}
+				else if (allowNoHead)
+				{
+					/* Deal with head not present */
+					hasHead = false;
 				}
 				else
-				{
-					// Check and tokenise response
-					size_t endA = 0;
-
-					endA = answer.find(',');
-					if ((endA == std::string::npos) || (endA == 0) || (endA >= (answer.length() - 1)))
-					{
-						ret = ERR_UNRECOGNIZED_ANSWER;
-					}
-
-					if (ret == DEVICE_OK)
-					{
-						start = atof(answer.substr(0, endA).c_str());
-						end = atof(answer.substr(endA + 1).c_str());
-					}
+				{			
+					/* Comms error and answer expected */
 				}
+			}
+
+			if (!hasHead)
+			{
+				/* Simulate valid response if head is not present during development */
+				start = 0.0;
+				end = 0.0;
+				ret = DEVICE_OK;
 			}
 		}
 	}

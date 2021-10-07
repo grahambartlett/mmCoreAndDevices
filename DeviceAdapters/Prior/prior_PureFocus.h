@@ -304,8 +304,19 @@ public:
 	int RefreshLineData();
 
 private:
+	/** Has initialization completed yet? */
 	bool initialized;
+
+	/** Device name */
 	const std::string name;
+
+	/** Set true during development if head unit may not be present */
+	const bool allowNoHead;
+
+	/** If allowNoHead is true, this reports whether we have found we have a head or not.
+	We can then avoid waiting for a timeout, which floods the event buffer.
+	*/
+	bool hasHead;
 
 	/** Serial port for comms */
 	std::string port;
@@ -368,90 +379,90 @@ private:
 	int SendObjectiveSlotProperties(const long slot);
 
 	/* Names of objective properties */
-	static char* propObjectivePrefix;
-	static char* propCurrentPrefix;
-	static char* propPreset;
-	static char* propLensOffset;
-	static char* propKP;
-	static char* propKI;
-	static char* propKD;
-	static char* propOutputLimitMinimum;
-	static char* propOutputLimitMaximum;
-	static char* propSampleLowThreshold;
-	static char* propFocusLowThreshold;
-	static char* propFocusHighThreshold;
-	static char* propFocusRangeThreshold;
-	static char* propInterfaceLowThreshold;
-	static char* propInterfaceHighThreshold;
-	static char* propLaserPower;
-	static char* propBackgroundA;
-	static char* propBackgroundB;
-	static char* propBackgroundC;
-	static char* propBackgroundD;
-	static char* propRegionStartD;
-	static char* propRegionEndD;
-	static char* propPinholeCentre;
-	static char* propPinholeWidth;
-	static char* propIsServoLimitOn;
-	static char* propServoLimitMaxPositiveMicrons;
-	static char* propServoLimitMaxNegativeMicrons;
+	static const char propObjectivePrefix[];
+	static const char propCurrentPrefix[];
+	static const char propPreset[];
+	static const char propLensOffset[];
+	static const char propKP[];
+	static const char propKI[];
+	static const char propKD[];
+	static const char propOutputLimitMinimum[];
+	static const char propOutputLimitMaximum[];
+	static const char propSampleLowThreshold[];
+	static const char propFocusLowThreshold[];
+	static const char propFocusHighThreshold[];
+	static const char propFocusRangeThreshold[];
+	static const char propInterfaceLowThreshold[];
+	static const char propInterfaceHighThreshold[];
+	static const char propLaserPower[];
+	static const char propBackgroundA[];
+	static const char propBackgroundB[];
+	static const char propBackgroundC[];
+	static const char propBackgroundD[];
+	static const char propRegionStartD[];
+	static const char propRegionEndD[];
+	static const char propPinholeCentre[];
+	static const char propPinholeWidth[];
+	static const char propIsServoLimitOn[];
+	static const char propServoLimitMaxPositiveMicrons[];
+	static const char propServoLimitMaxNegativeMicrons[];
 
 	/* Names of global properties */
-	static char* propIsPiezoMotor;
-	static char* propServoOn;
-	static char* propServoInhibit;
-	static char* propFocusInterruptOn;
-	static char* propInterfaceInhibit;
-	static char* propInterfaceInhibitCount;
-	static char* propDigipotControlsOffset;
-	static char* propIsServoDirectionPositive;
-	static char* propIsFocusDriveDirectionPositive;
-	static char* propExposureTimeUs;
-	static char* propDigipotOffsetSpeedPercent;
-	static char* propFocusDriveRangeMicrons;
-	static char* propInFocusRecoveryTimeMs;
+	static const char propIsPiezoMotor[];
+	static const char propServoOn[];
+	static const char propServoInhibit[];
+	static const char propFocusInterruptOn[];
+	static const char propInterfaceInhibit[];
+	static const char propInterfaceInhibitCount[];
+	static const char propDigipotControlsOffset[];
+	static const char propIsServoDirectionPositive[];
+	static const char propIsFocusDriveDirectionPositive[];
+	static const char propExposureTimeUs[];
+	static const char propDigipotOffsetSpeedPercent[];
+	static const char propFocusDriveRangeMicrons[];
+	static const char propInFocusRecoveryTimeMs[];
 
 	/* Names of control flag properties */
-	static char* propConfigInProgress;
-	static char* propSingleChangeInProgress;
+	static const char propConfigInProgress[];
+	static const char propSingleChangeInProgress[];
 
 	/* Names of volatile settings not saved */
-	static char* propObjective;
-	static char* propOffsetPositionMicrons;
-	static char* propFocusPositionMicrons;
-	static char* propLiftToLoadDistanceMicrons;
-	static char* propFocusPositionStepMicrons;
-	static char* propOffsetPositionStepMicrons;
+	static const char propObjective[];
+	static const char propOffsetPositionMicrons[];
+	static const char propFocusPositionMicrons[];
+	static const char propLiftToLoadDistanceMicrons[];
+	static const char propFocusPositionStepMicrons[];
+	static const char propOffsetPositionStepMicrons[];
 
 	/* Names of status values read back */
-	static char* propCalculationABCD;
-	static char* propFocusPidTarget;
-	static char* propFocusPidPosition;
-	static char* propFocusPidError;
-	static char* propFocusPidOutput;
-	static char* propFocusState;
-	static char* propTimeToInFocus;
-	static char* propIsOffsetMoving;
-	static char* propIsFocusDriveMoving;
-	static char* propPositiveLimitSwitch;
-	static char* propNegativeLimitSwitch;
-	static char* propServoInLimit;
-	static char* propIsSamplePresent;
-	static char* propIsInterfaceCorrect;
-	static char* propLineData1;
-	static char* propLineData2;
-	static char* propLineData3;
-	static char* propLineData4;
-	static char* propLineData5;
-	static char* propLineData6;
+	static const char propCalculationABCD[];
+	static const char propFocusPidTarget[];
+	static const char propFocusPidPosition[];
+	static const char propFocusPidError[];
+	static const char propFocusPidOutput[];
+	static const char propFocusState[];
+	static const char propTimeToInFocus[];
+	static const char propIsOffsetMoving[];
+	static const char propIsFocusDriveMoving[];
+	static const char propPositiveLimitSwitch[];
+	static const char propNegativeLimitSwitch[];
+	static const char propServoInLimit[];
+	static const char propIsSamplePresent[];
+	static const char propIsInterfaceCorrect[];
+	static const char propLineData1[];
+	static const char propLineData2[];
+	static const char propLineData3[];
+	static const char propLineData4[];
+	static const char propLineData5[];
+	static const char propLineData6[];
 
 	/* Other general properties */
-	static char* propSerialNumber;
-	static char* propFirmwareBuildVersion;
-	static char* propFirmwareBuildDateTime;
-	static char* propArrayReadIndex;
-	static char* propObjectivePresetNames;
-	static char* propExecuteCommand;
+	static const char propSerialNumber[];
+	static const char propFirmwareBuildVersion[];
+	static const char propFirmwareBuildDateTime[];
+	static const char propArrayReadIndex[];
+	static const char propObjectivePresetNames[];
+	static const char propExecuteCommand[];
 
 	/** State enumerations for executing command.
 

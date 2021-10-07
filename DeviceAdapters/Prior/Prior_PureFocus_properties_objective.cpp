@@ -371,32 +371,24 @@ int PureFocus850AutoFocus::OnPreset(MM::PropertyBase* pProp, MM::ActionType eAct
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
-					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
-					}
-					else
-					{
-						std::string value;
-						pProp->Get(value);
-						objective[slot - 1].setPreset(value);
-						UpdateObjectiveSlotProperties(slot);
-
-						ret = SendObjectiveSlotProperties(slot);
-					}
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
 				}
+				else
+				{
+					std::string value;
+					pProp->Get(value);
+					objective[slot - 1].setPreset(value);
+					UpdateObjectiveSlotProperties(slot);
 
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
+					ret = SendObjectiveSlotProperties(slot);
+				}
 			}
 
 			if (ret != DEVICE_OK)
@@ -465,60 +457,52 @@ int PureFocus850AutoFocus::OnPinholeCentre(MM::PropertyBase* pProp, MM::ActionTy
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetPinhole(value, objective[slot - 1].pinholeWidth);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetPinhole(value, objective[slot - 1].pinholeWidth);
+							// Changing one value can change the other, so read both back
+							double centre, width;
+							ret = GetPinhole(centre, width);
 							if (ret == DEVICE_OK)
 							{
-								// Changing one value can change the other, so read both back
-								double centre, width;
-								ret = GetPinhole(centre, width);
-								if (ret == DEVICE_OK)
+								// Store new values locally
+								objective[slot - 1].pinholeCentre = centre;		
+								objective[slot - 1].pinholeWidth = width;	
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
-									// Store new values locally
-									objective[slot - 1].pinholeCentre = centre;		
-									objective[slot - 1].pinholeWidth = width;	
-									if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-									{
-										// This is now a custom setting
-										objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-										std::string propertyName(propObjectivePrefix);
-										propertyName.append(1, (char)('0' + slot));
-										propertyName.append("-");
-										propertyName.append(propPreset);
-										UpdateProperty(propertyName.c_str());
-									}
+									// This is now a custom setting
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
+									propertyName.append(1, (char)('0' + slot));
+									propertyName.append("-");
+									propertyName.append(propPreset);
+									UpdateProperty(propertyName.c_str());
 								}
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -586,60 +570,52 @@ int PureFocus850AutoFocus::OnPinholeWidth(MM::PropertyBase* pProp, MM::ActionTyp
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetPinhole(objective[slot - 1].pinholeCentre, value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetPinhole(objective[slot - 1].pinholeCentre, value);
+							// Changing one value can change the other, so read both back
+							double centre, width;
+							ret = GetPinhole(centre, width);
 							if (ret == DEVICE_OK)
 							{
-								// Changing one value can change the other, so read both back
-								double centre, width;
-								ret = GetPinhole(centre, width);
-								if (ret == DEVICE_OK)
+								// Store new values locally
+								objective[slot - 1].pinholeCentre = centre;		
+								objective[slot - 1].pinholeWidth = width;	
+								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 								{
-									// Store new values locally
-									objective[slot - 1].pinholeCentre = centre;		
-									objective[slot - 1].pinholeWidth = width;	
-									if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-									{
-										// This is now a custom setting
-										objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-										std::string propertyName(propObjectivePrefix);
-										propertyName.append(1, (char)('0' + slot));
-										propertyName.append("-");
-										propertyName.append(propPreset);
-										UpdateProperty(propertyName.c_str());
-									}
+									// This is now a custom setting
+									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+									std::string propertyName(propObjectivePrefix);
+									propertyName.append(1, (char)('0' + slot));
+									propertyName.append("-");
+									propertyName.append(propPreset);
+									UpdateProperty(propertyName.c_str());
 								}
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -707,53 +683,45 @@ int PureFocus850AutoFocus::OnLaserPower(MM::PropertyBase* pProp, MM::ActionType 
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetLaserPower(value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetLaserPower(value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].laserPower = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].laserPower = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -821,56 +789,48 @@ int PureFocus850AutoFocus::OnBackgroundA(MM::PropertyBase* pProp, MM::ActionType
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetBackgrounds(value,
+							objective[slot - 1].backgroundB,
+							objective[slot - 1].backgroundC,
+							objective[slot - 1].backgroundD);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetBackgrounds(value,
-								objective[slot - 1].backgroundB,
-								objective[slot - 1].backgroundC,
-								objective[slot - 1].backgroundD);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].backgroundA = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].backgroundA = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -938,56 +898,48 @@ int PureFocus850AutoFocus::OnBackgroundB(MM::PropertyBase* pProp, MM::ActionType
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetBackgrounds(objective[slot - 1].backgroundA,
+							value,
+							objective[slot - 1].backgroundC,
+							objective[slot - 1].backgroundD);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetBackgrounds(objective[slot - 1].backgroundA,
-								value,
-								objective[slot - 1].backgroundC,
-								objective[slot - 1].backgroundD);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].backgroundB = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].backgroundB = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -1055,56 +1007,48 @@ int PureFocus850AutoFocus::OnBackgroundC(MM::PropertyBase* pProp, MM::ActionType
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetBackgrounds(objective[slot - 1].backgroundA,
+							objective[slot - 1].backgroundB,
+							value,
+							objective[slot - 1].backgroundD);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetBackgrounds(objective[slot - 1].backgroundA,
-								objective[slot - 1].backgroundB,
-								value,
-								objective[slot - 1].backgroundD);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].backgroundC = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].backgroundC = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -1172,56 +1116,48 @@ int PureFocus850AutoFocus::OnBackgroundD(MM::PropertyBase* pProp, MM::ActionType
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetBackgrounds(objective[slot - 1].backgroundA,
+							objective[slot - 1].backgroundB,
+							objective[slot - 1].backgroundC,
+							value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetBackgrounds(objective[slot - 1].backgroundA,
-								objective[slot - 1].backgroundB,
-								objective[slot - 1].backgroundC,
-								value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].backgroundD = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].backgroundD = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -1289,53 +1225,45 @@ int PureFocus850AutoFocus::OnKP(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetKP(value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetKP(value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].kP = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].kP = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -1403,53 +1331,45 @@ int PureFocus850AutoFocus::OnKI(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetKI(value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetKI(value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].kI = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].kI = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -1517,53 +1437,45 @@ int PureFocus850AutoFocus::OnKD(MM::PropertyBase* pProp, MM::ActionType eAct, lo
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetKD(value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetKD(value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].kD = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].kD = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -1631,53 +1543,45 @@ int PureFocus850AutoFocus::OnOutputLimitMin(MM::PropertyBase* pProp, MM::ActionT
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetOutputLimits(value, objective[slot - 1].outputLimitMax);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetOutputLimits(value, objective[slot - 1].outputLimitMax);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].outputLimitMin = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].outputLimitMin = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -1745,53 +1649,45 @@ int PureFocus850AutoFocus::OnOutputLimitMax(MM::PropertyBase* pProp, MM::ActionT
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetOutputLimits(objective[slot - 1].outputLimitMin, value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetOutputLimits(objective[slot - 1].outputLimitMin, value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].outputLimitMax = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].outputLimitMax = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -1859,53 +1755,45 @@ int PureFocus850AutoFocus::OnSampleLowThreshold(MM::PropertyBase* pProp, MM::Act
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetSampleLowThreshold(value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetSampleLowThreshold(value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].sampleLowThreshold = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].sampleLowThreshold = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -1973,53 +1861,45 @@ int PureFocus850AutoFocus::OnFocusLowThreshold(MM::PropertyBase* pProp, MM::Acti
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetFocusLowThreshold(value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetFocusLowThreshold(value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].focusLowThreshold = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].focusLowThreshold = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -2087,53 +1967,45 @@ int PureFocus850AutoFocus::OnFocusHighThreshold(MM::PropertyBase* pProp, MM::Act
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetFocusHighThreshold(value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetFocusHighThreshold(value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].focusHighThreshold = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].focusHighThreshold = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -2201,53 +2073,45 @@ int PureFocus850AutoFocus::OnFocusRangeThreshold(MM::PropertyBase* pProp, MM::Ac
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetFocusRangeThreshold(value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetFocusRangeThreshold(value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].focusRangeThreshold = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].focusRangeThreshold = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -2315,53 +2179,45 @@ int PureFocus850AutoFocus::OnInterfaceHighThreshold(MM::PropertyBase* pProp, MM:
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetInterfaceHighThreshold(value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetInterfaceHighThreshold(value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].interfaceHighThreshold = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].interfaceHighThreshold = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -2429,53 +2285,45 @@ int PureFocus850AutoFocus::OnInterfaceLowThreshold(MM::PropertyBase* pProp, MM::
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetInterfaceLowThreshold(value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetInterfaceLowThreshold(value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].interfaceLowThreshold = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].interfaceLowThreshold = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -2544,54 +2392,46 @@ int PureFocus850AutoFocus::OnServoLimitOn(MM::PropertyBase* pProp, MM::ActionTyp
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					long value;
+					pProp->Get(value);
+					if ((value < 0) || (value > 1))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						long value;
-						pProp->Get(value);
-						if ((value < 0) || (value > 1))
+						// Valid, so set value on controller
+						bool boolValue = (value != 0);
+						ret = SetServoLimit(boolValue, objective[slot - 1].servoLimitMaxPositiveMicrons, objective[slot - 1].servoLimitMaxNegativeMicrons);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							bool boolValue = (value != 0);
-							ret = SetServoLimit(boolValue, objective[slot - 1].servoLimitMaxPositiveMicrons, objective[slot - 1].servoLimitMaxNegativeMicrons);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].servoLimitOn = boolValue;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].servoLimitOn = boolValue;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -2661,53 +2501,45 @@ int PureFocus850AutoFocus::OnServoLimitMaxPositive(MM::PropertyBase* pProp, MM::
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetServoLimit(objective[slot - 1].servoLimitOn, value, objective[slot - 1].servoLimitMaxNegativeMicrons);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetServoLimit(objective[slot - 1].servoLimitOn, value, objective[slot - 1].servoLimitMaxNegativeMicrons);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].servoLimitMaxPositiveMicrons = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].servoLimitMaxPositiveMicrons = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -2776,53 +2608,45 @@ int PureFocus850AutoFocus::OnServoLimitMaxNegative(MM::PropertyBase* pProp, MM::
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetServoLimit(objective[slot - 1].servoLimitOn, objective[slot - 1].servoLimitMaxPositiveMicrons, value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetServoLimit(objective[slot - 1].servoLimitOn, objective[slot - 1].servoLimitMaxPositiveMicrons, value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].servoLimitMaxNegativeMicrons = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].servoLimitMaxNegativeMicrons = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -2883,53 +2707,45 @@ int PureFocus850AutoFocus::OnLensOffset(MM::PropertyBase* pProp, MM::ActionType 
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetStoredOffsetUm(lens, value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetStoredOffsetUm(lens, value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].lensOffsets[lens] = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].lensOffsets[lens] = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -2996,53 +2812,45 @@ int PureFocus850AutoFocus::OnRegionStartD(MM::PropertyBase* pProp, MM::ActionTyp
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetRegionD(value, objective[slot - 1].regionEndD);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetRegionD(value, objective[slot - 1].regionEndD);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].regionStartD = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].regionStartD = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)
@@ -3110,53 +2918,45 @@ int PureFocus850AutoFocus::OnRegionEndD(MM::PropertyBase* pProp, MM::ActionType 
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			// Need to know which objective setting is currently active
+			ret = UpdateProperty(propObjective);
 			if (ret == DEVICE_OK)
 			{
-				// Need to know which objective setting is currently active
-				ret = UpdateProperty(propObjective);
-				if (ret == DEVICE_OK)
+				if (slot != objectiveSelect)
 				{
-					if (slot != objectiveSelect)
+					// Can only set values for current objective
+					ret = ERR_INVALID_OBJECTIVE;
+				}
+				else
+				{
+					double value;
+					pProp->Get(value);
+					if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
 					{
-						// Can only set values for current objective
-						ret = ERR_INVALID_OBJECTIVE;
+						// Out of range
+						ret = ERR_INVALID_VALUE;
 					}
 					else
 					{
-						double value;
-						pProp->Get(value);
-						if ((value < pProp->GetLowerLimit()) || (value > pProp->GetUpperLimit()))
+						// Valid, so set value on controller
+						ret = SetRegionD(objective[slot - 1].regionStartD, value);
+						if (ret == DEVICE_OK)
 						{
-							// Out of range
-							ret = ERR_INVALID_VALUE;
-						}
-						else
-						{
-							// Valid, so set value on controller
-							ret = SetRegionD(objective[slot - 1].regionStartD, value);
-							if (ret == DEVICE_OK)
+							// Store new value locally
+							objective[slot - 1].regionEndD = value;
+							if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
 							{
-								// Store new value locally
-								objective[slot - 1].regionEndD = value;
-								if (objective[slot - 1].preset.compare(PureFocus850ObjectiveSlot::customPresetName) != 0)
-								{
-									// This is now a custom setting
-									objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-									std::string propertyName(propObjectivePrefix);
-									propertyName.append(1, (char)('0' + slot));
-									propertyName.append("-");
-									propertyName.append(propPreset);
-									UpdateProperty(propertyName.c_str());
-								}
+								// This is now a custom setting
+								objective[slot - 1].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+								std::string propertyName(propObjectivePrefix);
+								propertyName.append(1, (char)('0' + slot));
+								propertyName.append("-");
+								propertyName.append(propPreset);
+								UpdateProperty(propertyName.c_str());
 							}
 						}
 					}
 				}
-
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
 			}
 
 			if (ret != DEVICE_OK)

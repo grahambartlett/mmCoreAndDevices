@@ -32,90 +32,90 @@
 
 
 /* Names of objective properties */
-char* PureFocus850AutoFocus::propObjectivePrefix = "Objective";
-char* PureFocus850AutoFocus::propCurrentPrefix = "Current-";
-char* PureFocus850AutoFocus::propPreset = "Preset";
-char* PureFocus850AutoFocus::propLensOffset = "LensOffset";
-char* PureFocus850AutoFocus::propKP = "KP";
-char* PureFocus850AutoFocus::propKI = "KI";
-char* PureFocus850AutoFocus::propKD = "KD";
-char* PureFocus850AutoFocus::propOutputLimitMinimum = "OutputLimitMinimum";
-char* PureFocus850AutoFocus::propOutputLimitMaximum = "OutputLimitMaximum";
-char* PureFocus850AutoFocus::propSampleLowThreshold = "SampleLowThreshold";
-char* PureFocus850AutoFocus::propFocusLowThreshold = "FocusLowThreshold";
-char* PureFocus850AutoFocus::propFocusHighThreshold = "FocusHighThreshold";
-char* PureFocus850AutoFocus::propFocusRangeThreshold = "FocusRangeThreshold";
-char* PureFocus850AutoFocus::propInterfaceLowThreshold = "InterfaceLowThreshold";
-char* PureFocus850AutoFocus::propInterfaceHighThreshold = "InterfaceHighThreshold";
-char* PureFocus850AutoFocus::propLaserPower = "LaserPower";
-char* PureFocus850AutoFocus::propBackgroundA = "BackgroundA";
-char* PureFocus850AutoFocus::propBackgroundB = "BackgroundB";
-char* PureFocus850AutoFocus::propBackgroundC = "BackgroundC";
-char* PureFocus850AutoFocus::propBackgroundD = "BackgroundD";
-char* PureFocus850AutoFocus::propRegionStartD = "RegionStartD";
-char* PureFocus850AutoFocus::propRegionEndD = "RegionEndD";
-char* PureFocus850AutoFocus::propPinholeCentre = "PinholeCentre";
-char* PureFocus850AutoFocus::propPinholeWidth = "PinholeWidth";
-char* PureFocus850AutoFocus::propIsServoLimitOn = "IsServoLimitOn";
-char* PureFocus850AutoFocus::propServoLimitMaxPositiveMicrons = "ServoLimitMaxPositiveMicrons";
-char* PureFocus850AutoFocus::propServoLimitMaxNegativeMicrons = "ServoLimitMaxNegativeMicrons";
+const char PureFocus850AutoFocus::propObjectivePrefix[] = "Objective";
+const char PureFocus850AutoFocus::propCurrentPrefix[] = "Current-";
+const char PureFocus850AutoFocus::propPreset[] = "Preset";
+const char PureFocus850AutoFocus::propLensOffset[] = "LensOffset";
+const char PureFocus850AutoFocus::propKP[] = "KP";
+const char PureFocus850AutoFocus::propKI[] = "KI";
+const char PureFocus850AutoFocus::propKD[] = "KD";
+const char PureFocus850AutoFocus::propOutputLimitMinimum[] = "OutputLimitMinimum";
+const char PureFocus850AutoFocus::propOutputLimitMaximum[] = "OutputLimitMaximum";
+const char PureFocus850AutoFocus::propSampleLowThreshold[] = "SampleLowThreshold";
+const char PureFocus850AutoFocus::propFocusLowThreshold[] = "FocusLowThreshold";
+const char PureFocus850AutoFocus::propFocusHighThreshold[] = "FocusHighThreshold";
+const char PureFocus850AutoFocus::propFocusRangeThreshold[] = "FocusRangeThreshold";
+const char PureFocus850AutoFocus::propInterfaceLowThreshold[] = "InterfaceLowThreshold";
+const char PureFocus850AutoFocus::propInterfaceHighThreshold[] = "InterfaceHighThreshold";
+const char PureFocus850AutoFocus::propLaserPower[] = "LaserPower";
+const char PureFocus850AutoFocus::propBackgroundA[] = "BackgroundA";
+const char PureFocus850AutoFocus::propBackgroundB[] = "BackgroundB";
+const char PureFocus850AutoFocus::propBackgroundC[] = "BackgroundC";
+const char PureFocus850AutoFocus::propBackgroundD[] = "BackgroundD";
+const char PureFocus850AutoFocus::propRegionStartD[] = "RegionStartD";
+const char PureFocus850AutoFocus::propRegionEndD[] = "RegionEndD";
+const char PureFocus850AutoFocus::propPinholeCentre[] = "PinholeCentre";
+const char PureFocus850AutoFocus::propPinholeWidth[] = "PinholeWidth";
+const char PureFocus850AutoFocus::propIsServoLimitOn[] = "IsServoLimitOn";
+const char PureFocus850AutoFocus::propServoLimitMaxPositiveMicrons[] = "ServoLimitMaxPositiveMicrons";
+const char PureFocus850AutoFocus::propServoLimitMaxNegativeMicrons[] = "ServoLimitMaxNegativeMicrons";
 
 /* Names of global properties */
-char* PureFocus850AutoFocus::propIsPiezoMotor = "Global-IsPiezoMotor";
-char* PureFocus850AutoFocus::propServoOn = "Global-ServoOn";
-char* PureFocus850AutoFocus::propServoInhibit = "Global-ServoInhibit";
-char* PureFocus850AutoFocus::propFocusInterruptOn = "Global-FocusInterruptOn";
-char* PureFocus850AutoFocus::propInterfaceInhibit = "Global-InterfaceInhibit";
-char* PureFocus850AutoFocus::propInterfaceInhibitCount = "Global-InterfaceInhibitCount";
-char* PureFocus850AutoFocus::propDigipotControlsOffset = "Global-DigipotControlsOffset";
-char* PureFocus850AutoFocus::propIsServoDirectionPositive = "Global-IsServoDirectionPositive";
-char* PureFocus850AutoFocus::propIsFocusDriveDirectionPositive = "Global-IsFocusDriveDirectionPositive";
-char* PureFocus850AutoFocus::propExposureTimeUs = "Global-ExposureTimeUs";
-char* PureFocus850AutoFocus::propDigipotOffsetSpeedPercent = "Global-DigipotOffsetSpeedPercent";
-char* PureFocus850AutoFocus::propFocusDriveRangeMicrons = "Global-FocusDriveRangeMicrons";
-char* PureFocus850AutoFocus::propInFocusRecoveryTimeMs = "Global-InFocusRecoveryTimeMs";
+const char PureFocus850AutoFocus::propIsPiezoMotor[] = "Global-IsPiezoMotor";
+const char PureFocus850AutoFocus::propServoOn[] = "Global-ServoOn";
+const char PureFocus850AutoFocus::propServoInhibit[] = "Global-ServoInhibit";
+const char PureFocus850AutoFocus::propFocusInterruptOn[] = "Global-FocusInterruptOn";
+const char PureFocus850AutoFocus::propInterfaceInhibit[] = "Global-InterfaceInhibit";
+const char PureFocus850AutoFocus::propInterfaceInhibitCount[] = "Global-InterfaceInhibitCount";
+const char PureFocus850AutoFocus::propDigipotControlsOffset[] = "Global-DigipotControlsOffset";
+const char PureFocus850AutoFocus::propIsServoDirectionPositive[] = "Global-IsServoDirectionPositive";
+const char PureFocus850AutoFocus::propIsFocusDriveDirectionPositive[] = "Global-IsFocusDriveDirectionPositive";
+const char PureFocus850AutoFocus::propExposureTimeUs[] = "Global-ExposureTimeUs";
+const char PureFocus850AutoFocus::propDigipotOffsetSpeedPercent[] = "Global-DigipotOffsetSpeedPercent";
+const char PureFocus850AutoFocus::propFocusDriveRangeMicrons[] = "Global-FocusDriveRangeMicrons";
+const char PureFocus850AutoFocus::propInFocusRecoveryTimeMs[] = "Global-InFocusRecoveryTimeMs";
 
 /* Names of control properties */
-char* PureFocus850AutoFocus::propConfigInProgress = "ConfigInProgress";
-char* PureFocus850AutoFocus::propSingleChangeInProgress = "SingleChangeInProgress";
+const char PureFocus850AutoFocus::propConfigInProgress[] = "ConfigInProgress";
+const char PureFocus850AutoFocus::propSingleChangeInProgress[] = "SingleChangeInProgress";
 
 /* Names of volatile settings not saved */
-char* PureFocus850AutoFocus::propObjective = "Setting-Objective";
-char* PureFocus850AutoFocus::propOffsetPositionMicrons = "Setting-OffsetPositionMicrons";
-char* PureFocus850AutoFocus::propFocusPositionMicrons = "Setting-FocusPositionMicrons";
-char* PureFocus850AutoFocus::propLiftToLoadDistanceMicrons = "Setting-LiftToLoadDistanceMicrons";
-char* PureFocus850AutoFocus::propFocusPositionStepMicrons = "Setting-FocusPositionStepMicrons";
-char* PureFocus850AutoFocus::propOffsetPositionStepMicrons = "Setting-OffsetPositionStepMicrons";
+const char PureFocus850AutoFocus::propObjective[] = "Setting-Objective";
+const char PureFocus850AutoFocus::propOffsetPositionMicrons[] = "Setting-OffsetPositionMicrons";
+const char PureFocus850AutoFocus::propFocusPositionMicrons[] = "Setting-FocusPositionMicrons";
+const char PureFocus850AutoFocus::propLiftToLoadDistanceMicrons[] = "Setting-LiftToLoadDistanceMicrons";
+const char PureFocus850AutoFocus::propFocusPositionStepMicrons[] = "Setting-FocusPositionStepMicrons";
+const char PureFocus850AutoFocus::propOffsetPositionStepMicrons[] = "Setting-OffsetPositionStepMicrons";
 
 /* Names of status values read back */
-char* PureFocus850AutoFocus::propCalculationABCD = "Status-CalculationABCD";
-char* PureFocus850AutoFocus::propFocusPidTarget = "Status-FocusPidTarget";
-char* PureFocus850AutoFocus::propFocusPidPosition = "Status-FocusPidPosition";
-char* PureFocus850AutoFocus::propFocusPidError = "Status-FocusPidError";
-char* PureFocus850AutoFocus::propFocusPidOutput = "Status-FocusPidOutput";
-char* PureFocus850AutoFocus::propFocusState = "Status-FocusState";
-char* PureFocus850AutoFocus::propTimeToInFocus = "Status-TimeToInFocus";
-char* PureFocus850AutoFocus::propIsOffsetMoving = "Status-IsOffsetMoving";
-char* PureFocus850AutoFocus::propIsFocusDriveMoving = "Status-IsFocusDriveMoving";
-char* PureFocus850AutoFocus::propPositiveLimitSwitch = "Status-PositiveLimitSwitch";
-char* PureFocus850AutoFocus::propNegativeLimitSwitch = "Status-NegativeLimitSwitch";
-char* PureFocus850AutoFocus::propServoInLimit = "Status-ServoInLimit";
-char* PureFocus850AutoFocus::propIsSamplePresent = "Status-IsSamplePresent";
-char* PureFocus850AutoFocus::propIsInterfaceCorrect = "Status-IsInterfaceCorrect";
-char* PureFocus850AutoFocus::propLineData1 = "Status-LineData1";
-char* PureFocus850AutoFocus::propLineData2 = "Status-LineData2";
-char* PureFocus850AutoFocus::propLineData3 = "Status-LineData3";
-char* PureFocus850AutoFocus::propLineData4 = "Status-LineData4";
-char* PureFocus850AutoFocus::propLineData5 = "Status-LineData5";
-char* PureFocus850AutoFocus::propLineData6 = "Status-LineData6";
+const char PureFocus850AutoFocus::propCalculationABCD[] = "Status-CalculationABCD";
+const char PureFocus850AutoFocus::propFocusPidTarget[] = "Status-FocusPidTarget";
+const char PureFocus850AutoFocus::propFocusPidPosition[] = "Status-FocusPidPosition";
+const char PureFocus850AutoFocus::propFocusPidError[] = "Status-FocusPidError";
+const char PureFocus850AutoFocus::propFocusPidOutput[] = "Status-FocusPidOutput";
+const char PureFocus850AutoFocus::propFocusState[] = "Status-FocusState";
+const char PureFocus850AutoFocus::propTimeToInFocus[] = "Status-TimeToInFocus";
+const char PureFocus850AutoFocus::propIsOffsetMoving[] = "Status-IsOffsetMoving";
+const char PureFocus850AutoFocus::propIsFocusDriveMoving[] = "Status-IsFocusDriveMoving";
+const char PureFocus850AutoFocus::propPositiveLimitSwitch[] = "Status-PositiveLimitSwitch";
+const char PureFocus850AutoFocus::propNegativeLimitSwitch[] = "Status-NegativeLimitSwitch";
+const char PureFocus850AutoFocus::propServoInLimit[] = "Status-ServoInLimit";
+const char PureFocus850AutoFocus::propIsSamplePresent[] = "Status-IsSamplePresent";
+const char PureFocus850AutoFocus::propIsInterfaceCorrect[] = "Status-IsInterfaceCorrect";
+const char PureFocus850AutoFocus::propLineData1[] = "Status-LineData1";
+const char PureFocus850AutoFocus::propLineData2[] = "Status-LineData2";
+const char PureFocus850AutoFocus::propLineData3[] = "Status-LineData3";
+const char PureFocus850AutoFocus::propLineData4[] = "Status-LineData4";
+const char PureFocus850AutoFocus::propLineData5[] = "Status-LineData5";
+const char PureFocus850AutoFocus::propLineData6[] = "Status-LineData6";
 
 /* Other general properties */
-char* PureFocus850AutoFocus::propSerialNumber = "SerialNumber";
-char* PureFocus850AutoFocus::propFirmwareBuildVersion = "FirmwareBuildVersion";
-char* PureFocus850AutoFocus::propFirmwareBuildDateTime = "FirmwareBuildDateTime";
-char* PureFocus850AutoFocus::propArrayReadIndex = "ArrayReadIndex";
-char* PureFocus850AutoFocus::propObjectivePresetNames = "ObjectivePresetNames";
-char* PureFocus850AutoFocus::propExecuteCommand = "ExecuteCommand";
+const char PureFocus850AutoFocus::propSerialNumber[] = "SerialNumber";
+const char PureFocus850AutoFocus::propFirmwareBuildVersion[] = "FirmwareBuildVersion";
+const char PureFocus850AutoFocus::propFirmwareBuildDateTime[] = "FirmwareBuildDateTime";
+const char PureFocus850AutoFocus::propArrayReadIndex[] = "ArrayReadIndex";
+const char PureFocus850AutoFocus::propObjectivePresetNames[] = "ObjectivePresetNames";
+const char PureFocus850AutoFocus::propExecuteCommand[] = "ExecuteCommand";
 
 
 PureFocus850AutoFocus::PureFocus850AutoFocus() :
@@ -152,7 +152,15 @@ offsetPositionStepUm(1.0),
 // Config/setting updates
 configInProgress(false),
 singleChangeInProgress(false),
-arrayReadIndex(0)
+arrayReadIndex(0),
+hasHead(true),
+
+// Check whether to allow the driver to run without a head present, for development
+#ifdef _DEBUG
+allowNoHead(true)
+#else
+allowNoHead(false)
+#endif
 {
 	CPropertyAction* action;
 	CPropertyActionEx* actionEx;
@@ -654,7 +662,9 @@ CAutoFocusBase <PureFocus850AutoFocus>(),
 name(g_PureFocus850AutoFocusName),
 initialized(false),
 configInProgress(false),
-singleChangeInProgress(false)
+singleChangeInProgress(false),
+hasHead(true),
+allowNoHead(false)
 {
 	// Should never be called
 	assert(false);

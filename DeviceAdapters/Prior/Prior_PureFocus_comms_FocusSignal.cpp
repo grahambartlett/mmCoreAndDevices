@@ -51,55 +51,77 @@ int PureFocus850AutoFocus::GetABCD(double &a, double &b, double &c, double &d)
 
 		if (ret == DEVICE_OK)
 		{
-			// Block/wait for acknowledge, or until we time out
-			std::string answer;
-			ret = GetSerialAnswer(port.c_str(), "\r", answer);
-
-			if (ret == DEVICE_OK)
+			if (hasHead)
 			{
-				// Parse response
-				if ((answer.length() > 2) && (answer[0] == 'E'))
-				{
-					int errNo = atoi(answer.substr(2).c_str());
-					ret = ERR_OFFSET + errNo;
-				}
-				else
-				{
-					// Check and tokenise response
-					size_t endA = 0;
-					size_t endB = 0;
-					size_t endC = 0;
+				// Block/wait for acknowledge, or until we time out
+				std::string answer;
+				ret = GetSerialAnswer(port.c_str(), "\r", answer);
 
-					endA = answer.find(',');
-					if ((endA == std::string::npos) || (endA == 0) || (endA >= (answer.length() - 1)))
+				if (ret == DEVICE_OK)
+				{
+					// Parse response
+					if ((answer.length() > 2) && (answer[0] == 'E'))
 					{
-						ret = ERR_UNRECOGNIZED_ANSWER;
+						int errNo = atoi(answer.substr(2).c_str());
+						ret = ERR_OFFSET + errNo;
 					}
 					else
 					{
-						endB = answer.find(',', endA + 1);
-						if ((endB == std::string::npos) || ((endB - endA) < 2) || (endB >= (answer.length() - 1)))
+						// Check and tokenise response
+						size_t endA = 0;
+						size_t endB = 0;
+						size_t endC = 0;
+
+						endA = answer.find(',');
+						if ((endA == std::string::npos) || (endA == 0) || (endA >= (answer.length() - 1)))
 						{
 							ret = ERR_UNRECOGNIZED_ANSWER;
 						}
 						else
 						{
-							endC = answer.find(',', endB + 1);
-							if ((endC == std::string::npos) || ((endC - endB) < 2) || (endC >= (answer.length() - 1)))
+							endB = answer.find(',', endA + 1);
+							if ((endB == std::string::npos) || ((endB - endA) < 2) || (endB >= (answer.length() - 1)))
 							{
 								ret = ERR_UNRECOGNIZED_ANSWER;
 							}
+							else
+							{
+								endC = answer.find(',', endB + 1);
+								if ((endC == std::string::npos) || ((endC - endB) < 2) || (endC >= (answer.length() - 1)))
+								{
+									ret = ERR_UNRECOGNIZED_ANSWER;
+								}
+							}
+						}
+
+						if (ret == DEVICE_OK)
+						{
+							a = atof(answer.substr(0, endA).c_str());
+							b = atof(answer.substr(endA + 1, endB).c_str());
+							c = atof(answer.substr(endB + 1, endC).c_str());
+							d = atof(answer.substr(endC + 1).c_str());
 						}
 					}
-
-					if (ret == DEVICE_OK)
-					{
-						a = atof(answer.substr(0, endA).c_str());
-						b = atof(answer.substr(endA + 1, endB).c_str());
-						c = atof(answer.substr(endB + 1, endC).c_str());
-						d = atof(answer.substr(endC + 1).c_str());
-					}
 				}
+				else if (allowNoHead)
+				{
+					/* Deal with head not present */
+					hasHead = false;
+				}
+				else
+				{			
+					/* Comms error and answer expected */
+				}
+			}
+			
+			if (!hasHead)
+			{
+				/* Simulate valid response if head is not present during development */
+				a = 0.0;
+				b = 0.0;
+				c = 0.0;
+				d = 0.0;
+				ret = DEVICE_OK;
 			}
 		}
 	}

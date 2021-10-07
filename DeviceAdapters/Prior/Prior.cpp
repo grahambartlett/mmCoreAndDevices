@@ -184,6 +184,24 @@ int Prior::ClearPort(MM::Device& device, MM::Core& core, std::string port)
 }
 
 
+char Prior::NibbleToHex(unsigned int value)
+{
+	if ((value >= 0) && (value <= 9))
+	{
+		return (char)('0' + value);
+	}
+	else if ((value >= 10) && (value <= 15))
+	{
+		return (char)(('A' - 10) + value);
+	}
+	else
+	{
+		// Should never happen
+		return '0';
+	}
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Shutter 
 // ~~~~~~~

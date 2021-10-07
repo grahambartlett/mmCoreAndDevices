@@ -84,59 +84,51 @@ int PureFocus850AutoFocus::OnIsPiezoMotor(MM::PropertyBase* pProp, MM::ActionTyp
 		}
 		else
 		{
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
+			bool boolValue = (value != 0);
+			ret = SetPiezoMode(boolValue);
 			if (ret == DEVICE_OK)
 			{
-				bool boolValue = (value != 0);
-				ret = SetPiezoMode(boolValue);
+				double min, max;
+				std::string baseName, propertyName;
+
+				// Store new value locally
+				isPiezoMotor = boolValue;
+
+				// Read back new output limits, which change when this is changed
+				ret = GetOutputLimits(min, max);
 				if (ret == DEVICE_OK)
 				{
-					double min, max;
-					std::string baseName, propertyName;
-
-					// Store new value locally
-					isPiezoMotor = boolValue;
-
-					// Read back new output limits, which change when this is changed
-					ret = GetOutputLimits(min, max);
-					if (ret == DEVICE_OK)
+					int i;
+					for (i = 0; i < 6; i ++)
 					{
-						int i;
-						for (i = 0; i < 6; i ++)
+						if ((objective[i].outputLimitMin != min) || (objective[i].outputLimitMax != max))
 						{
-							if ((objective[i].outputLimitMin != min) || (objective[i].outputLimitMax != max))
-							{
-								objective[i].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
-								objective[i].outputLimitMin = min;
-								objective[i].outputLimitMax = max;
+							objective[i].preset.assign(PureFocus850ObjectiveSlot::customPresetName);
+							objective[i].outputLimitMin = min;
+							objective[i].outputLimitMax = max;
 
-								baseName.assign(propObjectivePrefix);
-								baseName.append(1, (char)('1' + i));
-								baseName.append("-");
+							baseName.assign(propObjectivePrefix);
+							baseName.append(1, (char)('1' + i));
+							baseName.append("-");
 
-								propertyName.assign(baseName);
-								propertyName.append(propOutputLimitMinimum);
-								UpdateProperty(propertyName.c_str());
+							propertyName.assign(baseName);
+							propertyName.append(propOutputLimitMinimum);
+							UpdateProperty(propertyName.c_str());
 
-								propertyName.assign(baseName);
-								propertyName.append(propOutputLimitMaximum);
-								UpdateProperty(propertyName.c_str());
-							}
+							propertyName.assign(baseName);
+							propertyName.append(propOutputLimitMaximum);
+							UpdateProperty(propertyName.c_str());
 						}
-
-						propertyName.assign(propCurrentPrefix);
-						propertyName.append(propOutputLimitMinimum);
-						UpdateProperty(propertyName.c_str());
-
-						propertyName.assign(propCurrentPrefix);
-						propertyName.append(propOutputLimitMaximum);
-						UpdateProperty(propertyName.c_str());
 					}
-				}
 
-				// If we locked the keypad, always unlock even if there was an error
-				(void)SetKeypadLock(false);
+					propertyName.assign(propCurrentPrefix);
+					propertyName.append(propOutputLimitMinimum);
+					UpdateProperty(propertyName.c_str());
+
+					propertyName.assign(propCurrentPrefix);
+					propertyName.append(propOutputLimitMaximum);
+					UpdateProperty(propertyName.c_str());
+				}
 			}
 
 			if (ret != DEVICE_OK)

@@ -44,6 +44,9 @@ int PureFocus850AutoFocus::OnConfigInProgress(MM::PropertyBase* pProp, MM::Actio
 
 		if (value == 1)
 		{
+			// Lock so that keypad cannot change settings during this
+			ret = SetKeypadLock(true);
+
 			/* Unit can continue running whilst we get updated configuration */
 			configInProgress = true;
 		}
@@ -65,9 +68,6 @@ int PureFocus850AutoFocus::OnConfigInProgress(MM::PropertyBase* pProp, MM::Actio
 
 			// After this, properties can only be changed for current objective
 			configInProgress = false;
-			
-			// Lock so that keypad cannot change settings during this
-			ret = SetKeypadLock(true);
 
 			// Save initial operating state for unit
 			if (ret == DEVICE_OK)
@@ -207,11 +207,18 @@ int PureFocus850AutoFocus::OnSingleChangeInProgress(MM::PropertyBase* pProp, MM:
 
 		if (value == 1)
 		{
-			/* Unit can continue running whilst we get updated configuration */
+			// Lock so that keypad cannot change settings during this
+			ret = SetKeypadLock(true);
+
+			// Allow changes to settings to be made
 			singleChangeInProgress = true;
 		}
 		else if (value == 0)
 		{
+			// Unlock keypad
+			ret = SetKeypadLock(false);
+
+			// Disallow changes to settings
 			singleChangeInProgress = false;
 		}
 		else

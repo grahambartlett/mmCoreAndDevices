@@ -443,28 +443,47 @@ int PureFocus850AutoFocus::GetOffsetPositionUm(double& value)
 
 		if (ret == DEVICE_OK)
 		{
-			// Block/wait for acknowledge, or until we time out
-			std::string answer;
-			ret = GetSerialAnswer(port.c_str(), "\r", answer);
-
-			if (ret == DEVICE_OK)
+			if (hasHead)
 			{
-				// Parse response
-				if ((answer.length() > 2) && (answer[0] == 'E'))
+				// Block/wait for acknowledge, or until we time out
+				std::string answer;
+				ret = GetSerialAnswer(port.c_str(), "\r", answer);
+
+				if (ret == DEVICE_OK)
 				{
-					int errNo = atoi(answer.substr(2).c_str());
-					ret = ERR_OFFSET + errNo;
+					// Parse response
+					if ((answer.length() > 2) && (answer[0] == 'E'))
+					{
+						int errNo = atoi(answer.substr(2).c_str());
+						ret = ERR_OFFSET + errNo;
+					}
+					else if (answer.length() >= 1)
+					{
+						// Convert value from steps to um, where 25600 steps = 1mm
+						value = atof(answer.c_str());
+						value *= (1000.0 / 25600.0);
+					}
+					else
+					{
+						ret = ERR_UNRECOGNIZED_ANSWER;
+					}
 				}
-				else if (answer.length() >= 1)
+				else if (allowNoHead)
 				{
-					// Convert value from steps to um, where 25600 steps = 1mm
-					value = atof(answer.c_str());
-					value *= (1000.0 / 25600.0);
+					/* Deal with head not present */
+					hasHead = false;
 				}
 				else
-				{
-					ret = ERR_UNRECOGNIZED_ANSWER;
+				{			
+					/* Comms error and answer expected */
 				}
+			}
+			
+			if (!hasHead)
+			{
+				/* Simulate valid response if head is not present during development */
+				value = 0.0;
+				ret = DEVICE_OK;
 			}
 		}
 	}
@@ -494,30 +513,49 @@ int PureFocus850AutoFocus::GetIsOffsetMoving(bool& value)
 
 		if (ret == DEVICE_OK)
 		{
-			// Block/wait for acknowledge, or until we time out
-			std::string answer;
-			ret = GetSerialAnswer(port.c_str(), "\r", answer);
-
-			if (ret == DEVICE_OK)
+			if (hasHead)
 			{
-				// Parse response
-				if ((answer.length() >= 1) && (answer[0] == '0'))
+				// Block/wait for acknowledge, or until we time out
+				std::string answer;
+				ret = GetSerialAnswer(port.c_str(), "\r", answer);
+
+				if (ret == DEVICE_OK)
 				{
-					value = false;
+					// Parse response
+					if ((answer.length() >= 1) && (answer[0] == '0'))
+					{
+						value = false;
+					}
+					else if ((answer.length() >= 1) && (answer[0] == '1'))
+					{
+						value = true;
+					}
+					else if ((answer.length() > 2) && (answer[0] == 'E'))
+					{
+						int errNo = atoi(answer.substr(2).c_str());
+						ret = ERR_OFFSET + errNo;
+					}
+					else
+					{
+						ret = ERR_UNRECOGNIZED_ANSWER;
+					}
 				}
-				else if ((answer.length() >= 1) && (answer[0] == '1'))
+				else if (allowNoHead)
 				{
-					value = true;
-				}
-				else if ((answer.length() > 2) && (answer[0] == 'E'))
-				{
-					int errNo = atoi(answer.substr(2).c_str());
-					ret = ERR_OFFSET + errNo;
+					/* Deal with head not present */
+					hasHead = false;
 				}
 				else
-				{
-					ret = ERR_UNRECOGNIZED_ANSWER;
+				{			
+					/* Comms error and answer expected */
 				}
+			}
+			
+			if (!hasHead)
+			{
+				/* Simulate valid response if head is not present during development */
+				value = false;
+				ret = DEVICE_OK;
 			}
 		}
 	}
@@ -550,26 +588,44 @@ int PureFocus850AutoFocus::SetOffsetPositionUm(const double value)
 
 		if (ret == DEVICE_OK)
 		{
-			// Block/wait for acknowledge, or until we time out
-			std::string answer;
-			ret = GetSerialAnswer(port.c_str(), "\r", answer);
-
-			if (ret == DEVICE_OK)
+			if (hasHead)
 			{
-				// Parse response
-				if ((answer.length() >= 1) && (answer[0] == '0'))
+				// Block/wait for acknowledge, or until we time out
+				std::string answer;
+				ret = GetSerialAnswer(port.c_str(), "\r", answer);
+
+				if (ret == DEVICE_OK)
 				{
-					// Success
+					// Parse response
+					if ((answer.length() >= 1) && (answer[0] == '0'))
+					{
+						// Success
+					}
+					else if ((answer.length() > 2) && (answer[0] == 'E'))
+					{
+						int errNo = atoi(answer.substr(2).c_str());
+						ret = ERR_OFFSET + errNo;
+					}
+					else
+					{
+						ret = ERR_UNRECOGNIZED_ANSWER;
+					}
 				}
-				else if ((answer.length() > 2) && (answer[0] == 'E'))
+				else if (allowNoHead)
 				{
-					int errNo = atoi(answer.substr(2).c_str());
-					ret = ERR_OFFSET + errNo;
+					/* Deal with head not present */
+					hasHead = false;
 				}
 				else
-				{
-					ret = ERR_UNRECOGNIZED_ANSWER;
+				{			
+					/* Comms error and answer expected */
 				}
+			}
+			
+			if (!hasHead)
+			{
+				/* Simulate valid response if head is not present during development */
+				ret = DEVICE_OK;
 			}
 		}
 	}
