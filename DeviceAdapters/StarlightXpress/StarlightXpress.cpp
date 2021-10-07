@@ -25,6 +25,7 @@
 #include "StarlightXpress.h"
 
 #include <sstream>
+#include <stdexcept>
 
 const char *StarlightXpressFilterWheel::device_name = "Filter Wheel";
 const char *StarlightXpressFilterWheel::device_desc = "Starlight Xpress Filter Wheel";
@@ -308,7 +309,7 @@ StarlightXpressFilterWheel::Response StarlightXpressFilterWheel::send(Command cm
       }
    }
 
-   ss = std::stringstream();
+   ss.str(std::string());
    ss << "Recieved Response : {" << (int)data[0] << ", " << (int)data[1] << "}";
    LogMessage(ss.str(), true);
 
